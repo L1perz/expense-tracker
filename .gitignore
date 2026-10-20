@@ -7,3 +7,8 @@ __pycache__/
 .vscode/
 .DS_Store
 /data/expenses.json
+/data/*.sqlite
+/data/*.sqlite-*
+*.json.tmp
+/staticfiles/
+.env
