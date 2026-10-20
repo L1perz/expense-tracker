@@ -1,14 +1,13 @@
-# ПР7: где показать каждый из 25 пунктов оценивания
+# Карта кода: 25 пунктов по SQLite и Django
 
-Памятка к таблице 7.6 из присланного задания. Все примеры относятся к варианту 14 —
-системе учёта расходов: **пользователь, счёт, категория, операция**.
+Карта реализации системы учёта расходов. Основные сущности:
+**пользователь, счёт, категория, операция**.
 
-Для каждого пункта ниже указаны конкретный код, действие для демонстрации и короткий
-ответ преподавателю. Ссылки на код закреплены на версии `8955b3f`, поэтому номера
-строк не изменятся при дальнейшей доработке проекта. Локально открывай тот же файл
-и переходи на указанную строку; в VS Code это можно сделать через `Ctrl+G`.
+Для каждого пункта ниже указаны конкретный код, действие для демонстрации и краткое
+объяснение работы приложения. Ссылки ведут на код в `main`. Локально открывай
+тот же файл и переходи на указанную строку; в VS Code это можно сделать через `Ctrl+G`.
 
-## Подготовка перед защитой
+## Подготовка к демонстрации
 
 Команды выполняются из папки с `manage.py`. Если база ещё не подготовлена:
 
@@ -17,7 +16,7 @@
 ```
 
 Если команда сообщает, что база уже содержит данные, повторный импорт не нужен.
-Для демонстрации создания таблиц используй отдельную базу `data/defense.sqlite`,
+Для демонстрации создания таблиц используй отдельную базу `data/demo.sqlite`,
 как описано в пунктах 3 и 5. Рабочую базу удалять или перезаписывать не требуется.
 
 Запусти сайт и оставь это окно PowerShell открытым:
@@ -134,7 +133,7 @@ Python-блоки ниже выполняются в этой консоли, Po
 ```python
 from pathlib import Path
 
-with connection(Path("data/defense.sqlite"), readonly=False) as conn:
+with connection(Path("data/demo.sqlite"), readonly=False) as conn:
     conn.executescript(Path("sql/schema.sql").read_text(encoding="utf-8"))
 ```
 
@@ -178,12 +177,12 @@ show("SELECT id, name FROM users ORDER BY id")
 в обычном PowerShell выполни:
 
 ```powershell
-.\.venv\Scripts\python.exe -m db.import_json --database data/defense.sqlite
+.\.venv\Scripts\python.exe -m db.import_json --database data/demo.sqlite
 ```
 
 Если этот демонстрационный файл уже содержит импортированные записи, программа
 сообщит об этом и сохранит их. Для показа самого процесса используй новый файл,
-например `data/defense-2.sqlite`, вместо перезаписи рабочей базы.
+например `data/demo-2.sqlite`, вместо перезаписи рабочей базы.
 
 **Короткий ответ:** JSON превращается в объекты, проверяются ID и ссылки,
 `to_dict()` подготавливает значения для параметров SQL. Сначала вставляются
@@ -266,8 +265,7 @@ SELECT в консоли; рабочий запрос сайта менять н
 
 **Короткий ответ:** признак отбора в этом проекте — принадлежность операции
 к категории. Операции с другой категорией исключаются. У операций этой версии
-нет статуса отмены, поэтому для своего варианта показываю реально существующий
-признак вместо статусов бронирования из примера Roomly.
+нет статуса отмены, поэтому здесь показана фильтрация по категории расхода.
 
 <a id="p10"></a>
 ## 10. Объединение таблиц с помощью JOIN
@@ -494,7 +492,7 @@ context = {"items": data.get_operations()}
 context = {"operations": data.get_operations()}
 ```
 
-Если преподаватель просит показать именно на странице, временно замени только
+Для демонстрации на самой странице временно замени только
 ключ `"operations"` на `"items"` в view списка, обнови `/operations/`, затем
 обязательно верни `"operations"` и обнови снова. Файл сохраняй после каждой правки.
 Не меняй одновременно SQL и шаблон: так будет видно, в чём причина.
@@ -606,42 +604,42 @@ GET → ошибки формы → путь к базе → SQL и параме
 git diff
 ```
 
-<!-- Ссылки закреплены на проверенной версии кода до добавления этой памятки. -->
-[schema]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/sql/schema.sql#L4-L34
-[schema-keys]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/sql/schema.sql#L9-L33
-[connection]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/db/database.py#L18-L33
-[row-factory]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/db/database.py#L25-L28
-[db-setting]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/expense_tracker/settings.py#L44-L45
-[import-schema]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/db/import_json.py#L19-L20
-[import]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/db/import_json.py#L12-L45
-[import-count]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/db/import_json.py#L21-L22
-[load-project]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/storage.py#L38-L63
-[q-operations]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/sql/queries.sql#L28-L35
-[q-low-balance]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/sql/queries.sql#L17-L21
-[q-conditions]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/sql/queries.sql#L44-L48
-[q-filter]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/sql/queries.sql#L37-L49
-[q-operation]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/sql/queries.sql#L51-L57
-[q-summary]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/sql/queries.sql#L59-L67
-[q-groups]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/sql/queries.sql#L69-L91
-[q-categories]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/sql/queries.sql#L72-L78
-[fetch]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/db/repository.py#L21-L29
-[get-accounts]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/db/repository.py#L40-L43
-[get-operations]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/db/repository.py#L59-L65
-[get-operation]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/db/repository.py#L68-L72
-[dated]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/db/repository.py#L53-L56
-[statistics-data]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/db/repository.py#L75-L87
-[operation-list]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/operations/views.py#L9-L17
-[operation-detail-view]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/operations/views.py#L20-L24
-[statistics-view]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/operations/views.py#L27-L33
-[operation-form]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/operations/forms.py#L10-L40
-[statistics-form]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/operations/forms.py#L43-L51
-[account-list]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/accounts/views.py#L9-L15
-[account-form]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/accounts/forms.py#L12-L14
-[filter-template]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/templates/includes/filter_form.html#L2-L4
-[operation-list-template]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/operations/templates/operations/list.html#L1-L2
-[operation-table]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/operations/templates/operations/includes/table.html#L1-L2
-[operation-detail-template]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/operations/templates/operations/detail.html#L1-L2
-[statistics-template]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/operations/templates/operations/statistics.html#L9-L20
-[constraint-test]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/tests/test_database.py#L56-L68
-[root-urls]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/expense_tracker/urls.py#L3-L7
-[operation-urls]: https://github.com/L1perz/expense-tracker/blob/8955b3fc5d048a602cffb6ddf45b29961a9cabb5/operations/urls.py#L5-L9
+<!-- Ссылки ведут на актуальную реализацию в основной ветке. -->
+[schema]: https://github.com/L1perz/expense-tracker/blob/main/sql/schema.sql#L4-L34
+[schema-keys]: https://github.com/L1perz/expense-tracker/blob/main/sql/schema.sql#L9-L33
+[connection]: https://github.com/L1perz/expense-tracker/blob/main/db/database.py#L18-L33
+[row-factory]: https://github.com/L1perz/expense-tracker/blob/main/db/database.py#L25-L28
+[db-setting]: https://github.com/L1perz/expense-tracker/blob/main/expense_tracker/settings.py#L44-L45
+[import-schema]: https://github.com/L1perz/expense-tracker/blob/main/db/import_json.py#L19-L20
+[import]: https://github.com/L1perz/expense-tracker/blob/main/db/import_json.py#L12-L45
+[import-count]: https://github.com/L1perz/expense-tracker/blob/main/db/import_json.py#L21-L22
+[load-project]: https://github.com/L1perz/expense-tracker/blob/main/storage.py#L38-L63
+[q-operations]: https://github.com/L1perz/expense-tracker/blob/main/sql/queries.sql#L28-L35
+[q-low-balance]: https://github.com/L1perz/expense-tracker/blob/main/sql/queries.sql#L17-L21
+[q-conditions]: https://github.com/L1perz/expense-tracker/blob/main/sql/queries.sql#L44-L48
+[q-filter]: https://github.com/L1perz/expense-tracker/blob/main/sql/queries.sql#L37-L49
+[q-operation]: https://github.com/L1perz/expense-tracker/blob/main/sql/queries.sql#L51-L57
+[q-summary]: https://github.com/L1perz/expense-tracker/blob/main/sql/queries.sql#L59-L67
+[q-groups]: https://github.com/L1perz/expense-tracker/blob/main/sql/queries.sql#L69-L91
+[q-categories]: https://github.com/L1perz/expense-tracker/blob/main/sql/queries.sql#L72-L78
+[fetch]: https://github.com/L1perz/expense-tracker/blob/main/db/repository.py#L21-L29
+[get-accounts]: https://github.com/L1perz/expense-tracker/blob/main/db/repository.py#L40-L43
+[get-operations]: https://github.com/L1perz/expense-tracker/blob/main/db/repository.py#L59-L65
+[get-operation]: https://github.com/L1perz/expense-tracker/blob/main/db/repository.py#L68-L72
+[dated]: https://github.com/L1perz/expense-tracker/blob/main/db/repository.py#L53-L56
+[statistics-data]: https://github.com/L1perz/expense-tracker/blob/main/db/repository.py#L75-L87
+[operation-list]: https://github.com/L1perz/expense-tracker/blob/main/operations/views.py#L9-L17
+[operation-detail-view]: https://github.com/L1perz/expense-tracker/blob/main/operations/views.py#L20-L24
+[statistics-view]: https://github.com/L1perz/expense-tracker/blob/main/operations/views.py#L27-L33
+[operation-form]: https://github.com/L1perz/expense-tracker/blob/main/operations/forms.py#L10-L40
+[statistics-form]: https://github.com/L1perz/expense-tracker/blob/main/operations/forms.py#L43-L51
+[account-list]: https://github.com/L1perz/expense-tracker/blob/main/accounts/views.py#L9-L15
+[account-form]: https://github.com/L1perz/expense-tracker/blob/main/accounts/forms.py#L12-L14
+[filter-template]: https://github.com/L1perz/expense-tracker/blob/main/templates/includes/filter_form.html#L2-L4
+[operation-list-template]: https://github.com/L1perz/expense-tracker/blob/main/operations/templates/operations/list.html#L1-L2
+[operation-table]: https://github.com/L1perz/expense-tracker/blob/main/operations/templates/operations/includes/table.html#L1-L2
+[operation-detail-template]: https://github.com/L1perz/expense-tracker/blob/main/operations/templates/operations/detail.html#L1-L2
+[statistics-template]: https://github.com/L1perz/expense-tracker/blob/main/operations/templates/operations/statistics.html#L9-L20
+[constraint-test]: https://github.com/L1perz/expense-tracker/blob/main/tests/test_database.py#L56-L68
+[root-urls]: https://github.com/L1perz/expense-tracker/blob/main/expense_tracker/urls.py#L3-L7
+[operation-urls]: https://github.com/L1perz/expense-tracker/blob/main/operations/urls.py#L5-L9

@@ -1,4 +1,4 @@
-"""Предметная модель ПР3; обычные Python-классы, не Django ORM."""
+"""Предметная модель: обычные Python-классы, не Django ORM."""
 
 from .accounts import Account
 from .categories import Category

@@ -65,7 +65,7 @@ def load_project(directory: Path) -> tuple[list[User], list[Account],
 
 def save_project(directory: Path, users: list[User], accounts: list[Account],
                  categories: list[Category], operations: list[Operation]) -> None:
-    """Сериализовать объекты в совместимый с ПР2 формат JSON."""
+    """Сериализовать объекты в формат JSON с идентификаторами связей."""
     for name, items in (("users", users), ("accounts", accounts),
                         ("categories", categories), ("operations", operations)):
         save_data(directory / f"{name}.json", [item.to_dict() for item in items])

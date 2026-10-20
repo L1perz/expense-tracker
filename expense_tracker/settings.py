@@ -1,4 +1,4 @@
-"""Учебная конфигурация Django 5.2 без ORM на этапе ПР5–ПР7."""
+"""Конфигурация Django 5.2 с прямым подключением к SQLite."""
 
 import os
 from pathlib import Path
@@ -34,7 +34,7 @@ TEMPLATES = [{
 }]
 WSGI_APPLICATION = "expense_tracker.wsgi.application"
 ASGI_APPLICATION = "expense_tracker.asgi.application"
-DATABASES = {}  # Прямой sqlite3 в ПР7; Django ORM появится на следующем этапе.
+DATABASES = {}  # Данные приложения доступны через sqlite3 без Django ORM.
 LANGUAGE_CODE = "ru-ru"
 TIME_ZONE = "Europe/Moscow"
 USE_I18N = True

@@ -9,7 +9,7 @@
 <a class="skip-link" href="#content">Перейти к содержимому</a>
 <aside class="sidebar"><a class="brand" href="{% url 'homepage:index' %}"><img src="{% static 'homepage/img/logo.svg' %}" alt="" width="36" height="36"><span>Расходы<small>Личные финансы</small></span></a>
 {% include 'includes/navigation.html' %}
-<div class="sidebar-note">● Система учёта расходов<br><span>Учебный проект · Вариант 14</span></div></aside>
+<div class="sidebar-note">● Система учёта расходов<br><span>Баланс, операции и аналитика</span></div></aside>
 <div class="workspace"><header class="topbar"><span>Личные финансы / {% block section %}Обзор{% endblock %}</span><time>{% now 'd.m.Y' %}</time></header>
 <main id="content" class="page-content">{% block content %}{% endblock %}</main>
 <footer>Система учёта расходов <span>Пользователи · Счета · Категории · Операции</span></footer></div></body></html>
