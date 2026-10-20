@@ -2,6 +2,7 @@
 
 from datetime import date
 from decimal import Decimal, InvalidOperation
+import re
 
 
 def input_int(prompt: str) -> int:
@@ -22,18 +23,31 @@ def input_date(prompt: str) -> date:
             print("Введите дату в формате ГГГГ-ММ-ДД.")
 
 
-def money_to_cents(text: str) -> int:
+def money_to_cents(text: str, allow_zero: bool = False) -> int:
     """Преобразовать рубли в копейки без ошибок float."""
     try:
         value = Decimal(text.strip().replace(",", "."))
     except InvalidOperation as error:
         raise ValueError("Введите сумму числом.") from error
+    if not value.is_finite():
+        raise ValueError("Сумма должна быть конечным числом.")
     cents = value * 100
-    if value <= 0 or cents != cents.to_integral_value():
-        raise ValueError("Сумма должна быть положительной, до двух знаков.")
+    if value < 0 or (value == 0 and not allow_zero):
+        raise ValueError("Сумма должна быть положительной.")
+    if cents != cents.to_integral_value():
+        raise ValueError("Допускается до двух знаков после запятой.")
     return int(cents)
 
 
 def format_money(cents: int) -> str:
     """Преобразовать копейки в строку с рублями."""
-    return f"{cents // 100}.{cents % 100:02d} руб."
+    sign = "-" if cents < 0 else ""
+    return f"{sign}{abs(cents) // 100}.{abs(cents) % 100:02d} руб."
+
+
+def validate_month(month: str) -> str:
+    """Проверить полный формат ГГГГ-ММ вместо поиска по префиксу."""
+    if not re.fullmatch(r"\d{4}-(0[1-9]|1[0-2])", month):
+        raise ValueError("Введите месяц в формате ГГГГ-ММ.")
+    date.fromisoformat(f"{month}-01")
+    return month

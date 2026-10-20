@@ -1,18 +1,18 @@
-"""Консольная система учёта расходов, функциональная модель ПР2."""
+"""Консольная система учёта расходов: объекты ПР3 и JSON."""
 
 from pathlib import Path
 
-from accounts import add_account
-from categories import add_category
-from operations import calculate_total, create_operation, filter_operations
-from storage import load_data, save_data
-from users import add_user
+from models.accounts import add_account
+from models.categories import add_category
+from models.operations import calculate_total, create_operation, filter_operations
+from storage import load_project, save_project
+from models.users import add_user
 from utils import format_money, input_date, input_int, money_to_cents
 
 DATA_DIR = Path(__file__).parent / "data"
 
 
-def show_items(title: str, items: list[dict]) -> None:
+def show_items(title: str, items: list) -> None:
     """Вывести коллекцию словарей в читаемом виде."""
     print(f"\n{title}")
     if not items:
@@ -21,22 +21,10 @@ def show_items(title: str, items: list[dict]) -> None:
         print(item)
 
 
-def save_all(users: list[dict], accounts: list[dict],
-             categories: list[dict], operations: list[dict]) -> None:
-    """Сохранить все коллекции приложения."""
-    save_data(DATA_DIR / "users.json", users)
-    save_data(DATA_DIR / "accounts.json", accounts)
-    save_data(DATA_DIR / "categories.json", categories)
-    save_data(DATA_DIR / "operations.json", operations)
-
-
 def main() -> None:
     """Загрузить данные и запустить цикл меню."""
     try:
-        users = load_data(DATA_DIR / "users.json")
-        accounts = load_data(DATA_DIR / "accounts.json")
-        categories = load_data(DATA_DIR / "categories.json")
-        operations = load_data(DATA_DIR / "operations.json")
+        users, accounts, categories, operations = load_project(DATA_DIR)
     except (OSError, ValueError) as error:
         print(f"Ошибка загрузки: {error}")
         return
@@ -59,7 +47,8 @@ def main() -> None:
             elif choice == "2":
                 add_account(accounts, users, input_int("ID пользователя: "),
                             input("Название счёта: "),
-                            money_to_cents(input("Начальный баланс: ")))
+                            money_to_cents(input("Начальный баланс: "),
+                                           allow_zero=True))
             elif choice == "3":
                 add_category(categories, input("Название категории: "))
             elif choice == "4":
@@ -86,7 +75,7 @@ def main() -> None:
             else:
                 print("Неизвестный пункт меню.")
                 continue
-            save_all(users, accounts, categories, operations)
+            save_project(DATA_DIR, users, accounts, categories, operations)
             print("Данные сохранены.")
         except (OSError, ValueError) as error:
             print(f"Ошибка: {error}")
