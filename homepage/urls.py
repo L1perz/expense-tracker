@@ -3,4 +3,8 @@ from django.urls import path
 from . import views
 
 app_name = "homepage"
-urlpatterns = [path("", views.index, name="index")]
+urlpatterns = [
+    path("", views.index, name="index"),
+    path("users/", views.user_list, name="users"),
+    path("categories/", views.category_list, name="categories"),
+]

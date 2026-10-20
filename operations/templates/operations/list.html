@@ -1,0 +1,2 @@
+{% extends 'base.html' %}{% load finance %}{% block title %}Операции{% endblock %}{% block section %}Операции{% endblock %}{% block content %}
+<div class="page-heading"><div><p class="eyebrow">История расходов</p><h1>Операции</h1><p class="muted">Все траты с привязкой к счёту, владельцу и категории.</p></div><span class="pill">Операций: {{ operations|length }}</span></div>{% block filters %}{% endblock %}<div class="list-summary"><span>Общая сумма расходов</span><strong>{{ total|money }}</strong></div>{% include 'operations/includes/table.html' %}{% endblock %}

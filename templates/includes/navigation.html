@@ -1,0 +1,11 @@
+<nav aria-label="Основная навигация" class="main-nav">
+{% with current=request.resolver_match.view_name %}
+<span class="nav-caption">Рабочее пространство</span>
+<a href="{% url 'homepage:index' %}" {% if current == 'homepage:index' %}aria-current="page"{% endif %}><span aria-hidden="true">◈</span> Обзор</a>
+<a href="{% url 'accounts:list' %}" {% if request.resolver_match.namespace == 'accounts' %}aria-current="page"{% endif %}><span aria-hidden="true">▣</span> Счета</a>
+<a href="{% url 'operations:list' %}" {% if request.resolver_match.namespace == 'operations' %}aria-current="page"{% endif %}><span aria-hidden="true">↗</span> Операции</a>
+{% block statistics_link %}{% endblock %}
+<span class="nav-caption">Справочники</span>
+<a href="{% url 'homepage:users' %}" {% if current == 'homepage:users' %}aria-current="page"{% endif %}><span aria-hidden="true">◎</span> Пользователи</a>
+<a href="{% url 'homepage:categories' %}" {% if current == 'homepage:categories' %}aria-current="page"{% endif %}><span aria-hidden="true">▦</span> Категории</a>
+{% endwith %}</nav>

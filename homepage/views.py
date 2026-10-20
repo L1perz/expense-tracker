@@ -1,13 +1,28 @@
-from django.utils.html import format_html
+from django.shortcuts import render
 
-from .rendering import page
+from . import data
 
 
 def index(request):
-    return page("Система учёта расходов", format_html(
-        "<p>Вариант 14. Пользователи, счета, категории и расходные операции.</p>"))
+    accounts = data.get_accounts()
+    operations = data.get_operations()
+    return render(request, "homepage/index.html", {
+        "accounts": accounts, "operations": operations[:5],
+        "summary": {"balance": sum(item["balance"] for item in accounts),
+                    "total": sum(item["amount"] for item in operations),
+                    "count": len(operations)},
+    })
+
+
+def user_list(request):
+    return render(request, "homepage/users.html", {"users": data.get_users()})
+
+
+def category_list(request):
+    return render(request, "homepage/categories.html", {
+        "categories": data.get_categories(),
+    })
 
 
 def page_not_found(request, exception):
-    return page("Страница не найдена", format_html("<p>Проверьте адрес страницы.</p>"),
-                status=404)
+    return render(request, "404.html", status=404)

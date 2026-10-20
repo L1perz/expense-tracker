@@ -1,0 +1,1 @@
+{% load finance %}<a class="account-card" href="{% url 'accounts:detail' account.id %}"><div class="card-top"><span class="account-symbol" aria-hidden="true">▣</span><span class="muted">№{{ account.id }} ↗</span></div><h3>{{ account.name }}</h3><strong>{{ account.balance|money }}</strong><span class="muted">{{ account.user_name }}</span></a>
