@@ -2,7 +2,7 @@
 
 
 def integer(value: int, label: str, minimum: int = 1) -> int:
-    if type(value) is not int or value < minimum:
+    if type(value) is not int or not minimum <= value <= 2**63 - 1:
         raise ValueError(f"{label}: требуется целое число от {minimum}.")
     return value
 

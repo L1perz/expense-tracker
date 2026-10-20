@@ -3,8 +3,8 @@
 <span class="nav-caption">Рабочее пространство</span>
 <a href="{% url 'homepage:index' %}" {% if current == 'homepage:index' %}aria-current="page"{% endif %}><span aria-hidden="true">◈</span> Обзор</a>
 <a href="{% url 'accounts:list' %}" {% if request.resolver_match.namespace == 'accounts' %}aria-current="page"{% endif %}><span aria-hidden="true">▣</span> Счета</a>
-<a href="{% url 'operations:list' %}" {% if request.resolver_match.namespace == 'operations' %}aria-current="page"{% endif %}><span aria-hidden="true">↗</span> Операции</a>
-{% block statistics_link %}{% endblock %}
+<a href="{% url 'operations:list' %}" {% if current == 'operations:list' or current == 'operations:detail' %}aria-current="page"{% endif %}><span aria-hidden="true">↗</span> Операции</a>
+<a href="{% url 'operations:statistics' %}" {% if current == 'operations:statistics' %}aria-current="page"{% endif %}><span aria-hidden="true">▤</span> Статистика</a>
 <span class="nav-caption">Справочники</span>
 <a href="{% url 'homepage:users' %}" {% if current == 'homepage:users' %}aria-current="page"{% endif %}><span aria-hidden="true">◎</span> Пользователи</a>
 <a href="{% url 'homepage:categories' %}" {% if current == 'homepage:categories' %}aria-current="page"{% endif %}><span aria-hidden="true">▦</span> Категории</a>

@@ -31,12 +31,13 @@ def money_to_cents(text: str, allow_zero: bool = False) -> int:
         raise ValueError("Введите сумму числом.") from error
     if not value.is_finite():
         raise ValueError("Сумма должна быть конечным числом.")
-    cents = value * 100
+    if value > Decimal("92233720368547758.07"):
+        raise ValueError("Сумма слишком велика.")
     if value < 0 or (value == 0 and not allow_zero):
         raise ValueError("Сумма должна быть положительной.")
-    if cents != cents.to_integral_value():
+    if value != value.quantize(Decimal("0.01")):
         raise ValueError("Допускается до двух знаков после запятой.")
-    return int(cents)
+    return int(value * 100)
 
 
 def format_money(cents: int) -> str:

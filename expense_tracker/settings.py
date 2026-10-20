@@ -21,6 +21,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "homepage.middleware.DatabaseStatusMiddleware",
 ]
 ROOT_URLCONF = "expense_tracker.urls"
 TEMPLATES = [{
@@ -41,4 +42,5 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 DATA_DIR = Path(os.environ.get("EXPENSE_DATA_DIR", BASE_DIR / "data"))
+EXPENSE_DB_PATH = Path(os.environ.get("EXPENSE_DB_PATH", DATA_DIR / "expenses.sqlite"))
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

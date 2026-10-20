@@ -13,7 +13,7 @@ DATA_DIR = Path(__file__).parent / "data"
 
 
 def show_items(title: str, items: list) -> None:
-    """Вывести коллекцию словарей в читаемом виде."""
+    """Вывести коллекцию объектов через их строковое представление."""
     print(f"\n{title}")
     if not items:
         print("Список пуст.")

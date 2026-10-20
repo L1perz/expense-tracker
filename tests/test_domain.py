@@ -31,7 +31,10 @@ def test_json_round_trip_restores_identity(tmp_path, entities):
     assert loaded_accounts[0].balance == 9750
 
 
-@pytest.mark.parametrize("bad", ["NaN", "Infinity", "-Infinity", "abc", "0", "1.001"])
+@pytest.mark.parametrize("bad", [
+    "NaN", "Infinity", "-Infinity", "abc", "0", "1.001", "1e999999",
+    "-1e999999", "1e-999999", "1.000000000000000000000000000001",
+])
 def test_invalid_money_is_rejected(bad):
     with pytest.raises(ValueError):
         money_to_cents(bad)

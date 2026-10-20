@@ -1,0 +1,6 @@
+{% if form.errors %}<div class="error-message" role="alert">Проверьте параметры фильтра: {% for field in form %}{% for error in field.errors %}{{ field.label }}: {{ error }} {% endfor %}{% endfor %}{{ form.non_field_errors }}</div>{% endif %}
+<form method="get" class="panel filters">
+  {% for field in form %}<div class="field">{{ field.label_tag }}{{ field }}</div>{% endfor %}
+  <button type="submit" class="button">Применить</button>
+  <a href="{{ clear_url }}" class="button secondary" data-clear-filters="{{ clear_url }}">Сбросить</a>
+</form>

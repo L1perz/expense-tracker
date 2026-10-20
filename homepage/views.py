@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from . import data
+from db import repository as data
 
 
 def index(request):
@@ -8,9 +8,7 @@ def index(request):
     operations = data.get_operations()
     return render(request, "homepage/index.html", {
         "accounts": accounts, "operations": operations[:5],
-        "summary": {"balance": sum(item["balance"] for item in accounts),
-                    "total": sum(item["amount"] for item in operations),
-                    "count": len(operations)},
+        "summary": data.get_summary(),
     })
 
 
