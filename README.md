@@ -134,6 +134,7 @@ expense-tracker/
 ├── data/                       # Четыре JSON-файла и локальная SQLite
 ├── tests/                      # Предметная модель, JSON, SQL и веб-страницы
 ├── requirements.txt
+├── PR7_DEFENSE.md               # Все 25 пунктов оценивания: код и демонстрация
 └── GUIDE.md                    # Карта практических работ и подготовка к защите
 ```
 
@@ -194,6 +195,10 @@ SQL хранится в одном файле `sql/queries.sql`, а `db/reposito
 Путь данных: `URL → view → db.repository → sqlite3 → SQLite → context → template`.
 
 ## Проверка
+
+Для защиты по таблице оценивания ПР7 подготовлена
+[памятка по всем 25 пунктам](PR7_DEFENSE.md): файлы и строки кода,
+примеры демонстрации и короткие ответы преподавателю.
 
 ```powershell
 .\.venv\Scripts\python.exe manage.py check
