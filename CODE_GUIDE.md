@@ -6,6 +6,7 @@
 | Списание и возврат в одной транзакции | `Operation.save()`, `Operation.cancel()` |
 | Запросы обзора и статистики | `ledger/queries.py` |
 | Условия статусов и поиск | `OperationQuerySet` в `ledger/models.py` |
+| Unicode-поиск SQLite и подключение функции | `ledger/db_functions.py`, `ledger/apps.py` |
 | GET-фильтры, дата и сортировка | `operations/forms.py` |
 | Список, фильтры, `Paginator` | `operations/views.py` |
 | `ModelForm`, рубли, изображения | `ledger/forms.py` |
@@ -35,7 +36,8 @@
 11. `Category.objects.filter(name_key=name.casefold()).exclude(pk=current_pk).exists()`
     — поиск повторяющегося названия при создании и редактировании категории.
 12. `operations.search(text)` — поиск по описанию, категории, счёту и имени владельца
-    через `Q` и `icontains`, включая поля связанных моделей.
+    через `Q`, `UnicodeCasefold` и `contains`, включая поля связанных моделей.
+    Регистр кириллицы сравнивается через `casefold()` с обеих сторон.
 13. `operations.order_by(sort, '-pk')` — стабильная сортировка; в `sort` попадают
     только разрешённые значения, в том числе `account__name` и `user__name`.
 14. `Account.objects.select_related('user').annotate(user_name=F('user__name'))`

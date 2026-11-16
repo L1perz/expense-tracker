@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .forms import AccountForm, OperationForm
+from .forms import AccountForm, CategoryForm, OperationForm
 from .models import Account, Category, Operation, User
 from utils import format_money
 
@@ -40,6 +40,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    form = CategoryForm
     list_display = ("id", "name")
     search_fields = ("name",)
     inlines = (OperationInline,)

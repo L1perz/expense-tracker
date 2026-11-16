@@ -11,6 +11,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
+from .db_functions import UnicodeCasefold
+
 MAX_MONEY = 999_999_999_999
 
 
@@ -86,14 +88,42 @@ class Account(models.Model):
                     {"user": "У счёта с операциями нельзя менять владельца."}
                 )
 
-    def save(self, *args, **kwargs):
+    def save(
+        self, *, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
         if not self.slug:
             # UUID avoids collisions and keeps Cyrillic account names supported.
             from uuid import uuid4
 
             self.slug = f"{slugify(self.name) or 'account'}-{uuid4().hex[:12]}"
-        self.full_clean()
-        return super().save(*args, **kwargs)
+        editing = not self._state.adding and not force_insert
+        if editing:
+            if update_fields is not None:
+                update_fields = set(update_fields)
+                if "balance" in update_fields:
+                    raise ValidationError(
+                        "Остаток счёта меняется только через операции."
+                    )
+            else:
+                # Не записываем старый остаток при изменении реквизитов счёта.
+                deferred = self.get_deferred_fields()
+                update_fields = {
+                    field.name
+                    for field in self._meta.concrete_fields
+                    if not field.primary_key
+                    and field.name != "balance"
+                    and field.attname not in deferred
+                }
+        self.full_clean(exclude=["balance"] if editing else None)
+        result = super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
+        if editing:
+            self.refresh_from_db(using=using, fields=["balance"])
+        return result
 
     def get_absolute_url(self):
         return reverse("accounts:detail_slug", kwargs={"slug": self.slug})
@@ -116,11 +146,17 @@ class OperationQuerySet(models.QuerySet):
         return self.select_related("user", "account__user", "category")
 
     def search(self, text):
-        return self.filter(
-            Q(description__icontains=text)
-            | Q(account__name__icontains=text)
-            | Q(category__name__icontains=text)
-            | Q(user__name__icontains=text)
+        text = text.casefold()
+        return self.alias(
+            search_description=UnicodeCasefold("description"),
+            search_account=UnicodeCasefold("account__name"),
+            search_category=UnicodeCasefold("category__name"),
+            search_user=UnicodeCasefold("user__name"),
+        ).filter(
+            Q(search_description__contains=text)
+            | Q(search_account__contains=text)
+            | Q(search_category__contains=text)
+            | Q(search_user__contains=text)
         )
 
     def update(self, **kwargs):
@@ -257,8 +293,12 @@ class Operation(models.Model):
             return super().save(*args, **kwargs)
 
     def cancel(self):
-        self.status = self.Status.CANCELLED
-        self.save()
+        with transaction.atomic():
+            # Отмена использует актуальную сумму и счёт, а не старый объект из вкладки.
+            self.refresh_from_db(from_queryset=Operation.objects.select_for_update())
+            if self.status != self.Status.CANCELLED:
+                self.status = self.Status.CANCELLED
+                self.save()
 
     def delete(self, *args, **kwargs):
         with transaction.atomic():

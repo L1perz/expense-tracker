@@ -137,9 +137,8 @@ def test_cannot_move_account_to_another_owner(wallet):
 
 def test_generated_field_and_slug(wallet):
     assert wallet[1].get_absolute_url().startswith("/accounts/by-name/")
-    wallet[1].balance = 2_000_000
-    wallet[1].save()
-    op = expense(wallet, amount=1_000_000)
+    account = Account.objects.create(user=wallet[0], name="Запас", balance=2_000_000)
+    op = expense((wallet[0], account, wallet[2]), amount=1_000_000)
     op.refresh_from_db()
     assert op.is_large
     op.amount = 999_999
