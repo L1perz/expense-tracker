@@ -1,6 +1,24 @@
-{% extends 'base.html' %}{% load finance %}{% block content %}
-<div class="page-heading"><div><p class="eyebrow">Всё под контролем</p><h1>Система учёта расходов</h1><p class="muted">Остатки на счетах и история повседневных трат.</p></div><a class="button" href="{% url 'operations:list' %}">Посмотреть операции ↗</a></div>
-<section class="summary-grid" aria-label="Сводка"><div class="summary-card featured"><span>Общий баланс</span><strong>{{ summary.balance|money }}</strong><small>На всех счетах</small></div><div class="summary-card"><span>Расходы за всё время</span><strong>{{ summary.total|money }}</strong><small>По сохранённым операциям</small></div><div class="summary-card"><span>Всего операций</span><strong>{{ summary.count }}</strong><small>В истории расходов</small></div></section>
-<section class="section"><div class="section-heading"><h2>Счета <span class="count">{{ accounts|length }}</span></h2><a href="{% url 'accounts:list' %}">Все счета →</a></div><div class="account-grid">{% for account in accounts %}{% include 'accounts/includes/card.html' with account=account %}{% empty %}<p class="empty-state">Счетов пока нет.</p>{% endfor %}</div></section>
-<section class="section"><div class="section-heading"><h2>Последние операции</h2><a href="{% url 'operations:list' %}">Вся история →</a></div>{% include 'operations/includes/table.html' with operations=operations %}</section>
-<details data-about><summary>О проекте</summary><p>Система учёта расходов помогает следить за остатками на счетах и анализировать траты. Счёт принадлежит пользователю, а каждая расходная операция связана со счётом и категорией. Суммы отображаются в рублях.</p></details>{% endblock %}
+{% extends 'base.html' %}
+{% load finance ui %}
+{% block content %}
+<div class="page-heading">
+  <div><h1>Обзор финансов</h1><p class="muted">Остатки на счетах и история повседневных трат.</p></div>
+  <a class="text-link" href="{% url 'operations:list' %}">Все операции {% icon 'arrow' %}</a>
+</div>
+<section class="overview-summary" aria-label="Сводка">
+  <div class="balance-overview"><span class="metric-label">Общий баланс</span><p class="metric-value">{{ summary.balance|rubles }} <span class="currency">₽</span></p><span class="muted">На всех счетах</span></div>
+  <div><span class="metric-label">Расходы за всё время</span><p class="metric-value secondary-metric">{{ summary.total|rubles }} <span class="currency">₽</span></p><span class="muted">Только оплаченные расходы</span></div>
+  <div><span class="metric-label">Оплаченных операций</span><p class="metric-value secondary-metric">{{ summary.count }}</p><span class="muted">В истории расходов</span></div>
+</section>
+<section class="section" aria-labelledby="accounts-heading">
+  <div class="section-heading"><h2 id="accounts-heading">Мои счета <span class="count">{{ accounts|length }}</span></h2><a class="text-link" href="{% url 'accounts:create' %}">{% icon 'plus' %} Добавить счёт</a></div>
+  <div class="account-grid">
+    {% for account in accounts %}{% include 'accounts/includes/card.html' with account=account %}
+    {% empty %}<div class="empty-state"><h3>Добавьте первый счёт</h3><p>Укажите владельца и начальный баланс, чтобы записывать расходы.</p><a class="button secondary" href="{% url 'accounts:create' %}">Добавить счёт</a></div>{% endfor %}
+  </div>
+</section>
+<section class="section" aria-labelledby="recent-heading">
+  <div class="section-heading"><h2 id="recent-heading">Последние операции</h2><a class="text-link" href="{% url 'operations:list' %}">Вся история {% icon 'arrow' %}</a></div>
+  {% include 'operations/includes/table.html' %}
+</section>
+{% endblock %}

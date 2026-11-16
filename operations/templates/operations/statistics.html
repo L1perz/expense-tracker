@@ -3,21 +3,24 @@
 {% block title %}Статистика{% endblock %}
 {% block section %}Статистика{% endblock %}
 {% block content %}
-<div class="page-heading"><div><p class="eyebrow">Картина расходов</p><h1>Статистика</h1><p class="muted">Сравнивайте категории и следите за расходами по месяцам.</p></div></div>
-{% url 'operations:statistics' as clear_url %}{% include 'includes/filter_form.html' %}
+<div class="page-heading"><div><h1>Статистика</h1><p class="muted">Распределение расходов по категориям, людям и месяцам.</p></div></div>
+{% url 'operations:statistics' as clear_url %}
+{% include 'includes/filter_form.html' %}
 {% if not form.errors %}
-<p class="muted">Оплачено: {{ statuses.completed }} · Запланировано: {{ statuses.pending }} · Отменено: {{ statuses.cancelled }}. В суммы расходов входят только оплаченные операции.</p>
-<section class="summary-grid" aria-label="Показатели за выбранный период">
-  <div class="summary-card featured"><span>Расходы за {% if form.cleaned_data.month %}{{ form.cleaned_data.month }}{% else %}всё время{% endif %}</span><strong>{{ summary.total|money }}</strong><small>{{ summary.count }} операций</small></div>
-  <div class="summary-card"><span>Самая крупная трата</span><strong>{{ summary.maximum|money }}</strong><small>За выбранный период</small></div>
-  <div class="summary-card"><span>Самая небольшая трата</span><strong>{{ summary.minimum|money }}</strong><small>За выбранный период</small></div>
+<section class="overview-summary" aria-label="Показатели за выбранный период">
+  <div class="balance-overview"><span class="metric-label">Расходы за {% if form.cleaned_data.month %}{{ form.cleaned_data.month }}{% else %}всё время{% endif %}</span><p class="metric-value">{{ summary.total|rubles }} <span class="currency">₽</span></p><span class="muted">{{ summary.count }} оплаченных операций</span></div>
+  <div><span class="metric-label">Самая крупная трата</span><p class="metric-value secondary-metric">{{ summary.maximum|rubles }} <span class="currency">₽</span></p><span class="muted">За выбранный период</span></div>
+  <div><span class="metric-label">Самая небольшая трата</span><p class="metric-value secondary-metric">{{ summary.minimum|rubles }} <span class="currency">₽</span></p><span class="muted">За выбранный период</span></div>
 </section>
+<div class="status-summary"><span>Оплачено <strong>{{ statuses.completed }}</strong></span><span>Запланировано <strong>{{ statuses.pending }}</strong></span><span>Отменено <strong>{{ statuses.cancelled }}</strong></span></div>
 <section class="section statistics-grid">
-  <article class="panel statistics-panel"><h2>По категориям</h2><p class="muted">Порог суммы применяется только к категориям.</p>
-  {% for category in categories %}<div class="chart-row"><span>{{ category.name }}<small class="row-subtitle">Операций: {{ category.count }}</small></span><div class="chart-track" aria-hidden="true"><div class="chart-fill" style="width:{% widthratio category.total summary.total 100 %}%"></div></div><strong class="align-right">{{ category.total|money }}</strong></div>{% empty %}<p class="empty-state">Категорий с такой суммой не найдено.</p>{% endfor %}</article>
-  <article class="panel statistics-panel"><h2>По пользователям</h2>
-  {% for user in users %}<div class="chart-row"><span>{{ user.name }}<small class="row-subtitle">Операций: {{ user.count }}</small></span><div class="chart-track" aria-hidden="true"><div class="chart-fill" style="width:{% widthratio user.total summary.total 100 %}%"></div></div><strong class="align-right">{{ user.total|money }}</strong></div>{% empty %}<p class="empty-state">Пользователей пока нет.</p>{% endfor %}</article>
+  <article class="statistics-panel"><h2>По категориям</h2><p class="muted">Порог суммы применяется только к категориям.</p>
+    {% for category in categories %}<div class="chart-row"><span>{{ category.name }}<small class="row-subtitle">Операций: {{ category.count }}</small></span><div class="chart-track" aria-hidden="true"><div class="chart-fill" style="width:{% widthratio category.total summary.total 100 %}%"></div></div><strong>{{ category.total|rubles }} ₽</strong></div>{% empty %}<p class="empty-state">Категорий с такой суммой не найдено.</p>{% endfor %}
+  </article>
+  <article class="statistics-panel"><h2>По пользователям</h2>
+    {% for user in users %}<div class="chart-row"><span>{{ user.name }}<small class="row-subtitle">Операций: {{ user.count }}</small></span><div class="chart-track" aria-hidden="true"><div class="chart-fill" style="width:{% widthratio user.total summary.total 100 %}%"></div></div><strong>{{ user.total|rubles }} ₽</strong></div>{% empty %}<p class="empty-state">Пользователей пока нет.</p>{% endfor %}
+  </article>
 </section>
-<section class="section"><div class="section-heading"><h2>Динамика за все месяцы</h2></div><div class="panel table-wrap"><table><thead><tr><th scope="col">Месяц</th><th scope="col">Операций</th><th scope="col" class="align-right">Расходы</th></tr></thead><tbody>{% for month in months %}<tr><td><a href="{% url 'operations:list' %}?month={{ month.month|urlencode }}">{{ month.month }}</a></td><td>{{ month.count }}</td><td class="align-right amount">{{ month.total|money }}</td></tr>{% empty %}<tr><td colspan="3" class="empty-state">Операций пока нет.</td></tr>{% endfor %}</tbody></table></div></section>
+<section class="section"><div class="section-heading"><h2>Динамика за все месяцы</h2></div><div class="panel table-wrap"><table><caption class="sr-only">Расходы по месяцам</caption><thead><tr><th scope="col">Месяц</th><th scope="col">Операций</th><th scope="col" class="align-right">Расходы</th></tr></thead><tbody>{% for month in months %}<tr><td><a href="{% url 'operations:list' %}?month={{ month.month|urlencode }}">{{ month.month }}</a></td><td>{{ month.count }}</td><td class="align-right amount">{{ month.total|rubles }} ₽</td></tr>{% empty %}<tr><td colspan="3" class="empty-state">Операций пока нет.</td></tr>{% endfor %}</tbody></table></div></section>
 {% endif %}
 {% endblock %}

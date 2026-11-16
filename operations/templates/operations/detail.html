@@ -1,2 +1,15 @@
-{% extends 'base.html' %}{% load finance %}{% block title %}Операция №{{ operation.id }}{% endblock %}{% block section %}Операции{% endblock %}{% block content %}
-<a class="back-link" href="{% url 'operations:list' %}">← Все операции</a><div class="page-heading"><div><p class="eyebrow">Операция №{{ operation.id }}</p><h1>{{ operation.description }}</h1><p class="muted">{{ operation.date|date:'j E Y' }}</p></div><span class="pill">Расход</span></div><section class="panel detail-panel"><p class="detail-amount">−{{ operation.amount|money }}</p><dl><div><dt>Пользователь</dt><dd>{{ operation.user_name }}</dd></div><div><dt>Счёт</dt><dd><a href="{% url 'accounts:detail' operation.account_id %}">{{ operation.account_name }} →</a></dd></div><div><dt>Категория</dt><dd>{{ operation.category_name }}</dd></div><div><dt>Описание</dt><dd>{{ operation.description|default:'Без описания' }}</dd></div></dl></section>{% endblock %}
+{% extends 'base.html' %}
+{% load finance ui %}
+{% block title %}Операция №{{ operation.id }}{% endblock %}
+{% block section %}Операции{% endblock %}
+{% block content %}
+<a class="back-link" href="{% url 'operations:list' %}">{% icon 'back' %} Все операции</a>
+<div class="page-heading"><div><h1>{{ operation.description }}</h1><p class="muted">{{ operation.date|date:'j E Y' }} · Операция №{{ operation.id }}</p></div><span class="status status--{{ operation.status }}">{{ operation.get_status_display }}</span></div>
+<section class="panel detail-panel">
+  <p class="metric-label">Сумма расхода</p><p class="detail-amount{% if operation.status == 'cancelled' %} amount--cancelled{% endif %}">{% if operation.status == 'completed' %}−{% endif %}{{ operation.amount|rubles }} <span class="currency">₽</span></p>
+  <dl><div><dt>Пользователь</dt><dd>{{ operation.user_name }}</dd></div><div><dt>Счёт</dt><dd><a class="text-link" href="{{ operation.account.get_absolute_url }}">{{ operation.account_name }} {% icon 'arrow' %}</a></dd></div><div><dt>Категория</dt><dd>{{ operation.category_name }}</dd></div><div><dt>Описание</dt><dd>{{ operation.description }}</dd></div></dl>
+  <div class="form-actions"><a class="button secondary" href="{% url 'operations:edit' operation.pk %}">{% icon 'edit' %} Изменить расход</a>
+  {% if operation.status != 'cancelled' %}<form method="post" action="{% url 'operations:cancel' operation.pk %}">{% csrf_token %}<button class="button danger" type="submit" data-pending-label="Отмена…">Отменить расход</button></form>{% endif %}</div>
+  {% if operation.status == 'cancelled' %}<p class="muted">Отменённый расход сохранён в истории и не входит в сумму расходов.</p>{% endif %}
+</section>
+{% endblock %}

@@ -1,2 +1,14 @@
-{% extends 'base.html' %}{% load finance %}{% block title %}{{ account.name }}{% endblock %}{% block section %}Счета{% endblock %}{% block content %}
-<a class="back-link" href="{% url 'accounts:list' %}">← Все счета</a><div class="page-heading"><div><p class="eyebrow">Счёт №{{ account.id }}</p><h1>{{ account.name }}</h1><p class="muted">Владелец: {{ account.user_name }}</p></div></div><section class="summary-card featured"><span>Текущий баланс</span><strong>{{ account.balance|money }}</strong></section><section class="section"><div class="section-heading"><h2>Расходы по счёту</h2></div>{% include 'operations/includes/table.html' %}</section>{% endblock %}
+{% extends 'base.html' %}
+{% load finance ui %}
+{% block title %}{{ account.name }}{% endblock %}
+{% block section %}Счета{% endblock %}
+{% block content %}
+<a class="back-link" href="{% url 'accounts:list' %}">{% icon 'back' %} Все счета</a>
+<div class="page-heading"><div><h1>{{ account.name }}</h1><p class="muted">{{ account.user_name }} · Счёт №{{ account.id }}</p></div><a class="button secondary" href="{% url 'accounts:edit' account.pk %}">{% icon 'edit' %} Изменить счёт</a></div>
+<section class="account-overview" aria-label="Баланс счёта">
+  <div><span class="metric-label">Текущий баланс</span><p class="metric-value">{{ account.balance|rubles }} <span class="currency">₽</span></p></div>
+  {% if account.image %}<img class="account-image" src="{{ account.image.url }}" alt="Изображение счёта {{ account.name }}" width="240" height="144">{% endif %}
+</section>
+<section class="section"><div class="section-heading"><h2>Операции по счёту</h2></div>{% include 'operations/includes/table.html' %}</section>
+<div class="secondary-actions"><a class="danger-link" href="{% url 'accounts:delete' account.pk %}">Удалить счёт</a></div>
+{% endblock %}

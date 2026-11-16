@@ -1,2 +1,19 @@
-{% load finance %}<div class="panel table-wrap"><table><thead><tr><th scope="col">Операция</th><th scope="col">Категория</th><th scope="col">Счёт / владелец</th><th scope="col">Дата</th><th scope="col" class="align-right">Расход</th></tr></thead><tbody>
-{% for operation in operations %}<tr><td><a class="operation-link" href="{{ operation.get_absolute_url }}">{{ operation.description|default:'Без описания' }}</a><small class="row-subtitle">№{{ operation.id }} · {{ operation.get_status_display }}</small></td><td><span class="tag">{{ operation.category_name }}</span></td><td><a href="{{ operation.account.get_absolute_url }}">{{ operation.account_name }}</a><small class="row-subtitle">{{ operation.user_name }}</small></td><td class="nowrap">{{ operation.date|date:'d.m.Y' }}</td><td class="align-right amount">{{ operation.amount|money }}</td></tr>{% empty %}<tr><td colspan="5" class="empty-state">Операций не найдено.</td></tr>{% endfor %}</tbody></table></div>
+{% load finance %}
+<div class="panel table-wrap">
+  <table class="operations-table">
+    <caption class="sr-only">Расходные операции: описание, категория, счёт, дата, статус и сумма</caption>
+    <thead><tr><th scope="col">Операция</th><th scope="col">Категория</th><th scope="col">Счёт и владелец</th><th scope="col">Дата</th><th scope="col">Статус</th><th scope="col" class="align-right">Сумма</th></tr></thead>
+    <tbody>
+      {% for operation in operations %}
+      <tr>
+        <td class="operation-cell"><a class="operation-link" href="{{ operation.get_absolute_url }}">{{ operation.description|default:'Без описания' }}</a><small class="row-subtitle">Операция №{{ operation.id }}</small></td>
+        <td class="category-cell"><span class="category-name">{{ operation.category_name }}</span></td>
+        <td class="account-cell"><a href="{{ operation.account.get_absolute_url }}">{{ operation.account_name }}</a><small class="row-subtitle">{{ operation.user_name }}</small></td>
+        <td class="date-cell nowrap">{{ operation.date|date:'d.m.Y' }}</td>
+        <td class="status-cell"><span class="status status--{{ operation.status }}">{{ operation.get_status_display }}</span></td>
+        <td class="amount-cell align-right amount{% if operation.status == 'cancelled' %} amount--cancelled{% endif %}">{% if operation.status == 'completed' %}−{% endif %}{{ operation.amount|rubles }} <span class="currency">₽</span></td>
+      </tr>
+      {% empty %}<tr class="empty-row"><td colspan="6"><div class="empty-state"><h3>Операций не найдено</h3><p>Попробуйте изменить фильтры или добавьте новый расход.</p><a class="button secondary" href="{% url 'operations:create' %}">Добавить расход</a></div></td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>

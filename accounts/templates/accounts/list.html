@@ -1,2 +1,14 @@
-{% extends 'base.html' %}{% block title %}Счета{% endblock %}{% block section %}Счета{% endblock %}{% block content %}
-<div class="page-heading"><div><p class="eyebrow">Ваши деньги</p><h1>Счета</h1><p class="muted">Текущие остатки и владельцы счетов.</p></div><span class="pill">Счетов: {{ accounts|length }}</span></div>{% url 'accounts:list' as clear_url %}{% include 'includes/filter_form.html' %}<div class="account-grid">{% for account in accounts %}{% include 'accounts/includes/card.html' %}{% empty %}<p class="panel empty-state">Счета не найдены.</p>{% endfor %}</div>{% endblock %}
+{% extends 'base.html' %}
+{% load ui %}
+{% block title %}Счета{% endblock %}
+{% block section %}Счета{% endblock %}
+{% block content %}
+<div class="page-heading"><div><h1>Счета</h1><p class="muted">Текущие остатки и владельцы счетов.</p></div><a class="button secondary" href="{% url 'accounts:create' %}">{% icon 'plus' %} Добавить счёт</a></div>
+{% url 'accounts:list' as clear_url %}
+{% include 'includes/filter_form.html' %}
+<p class="result-count">Счетов в списке: {{ accounts|length }}</p>
+<div class="account-grid">
+  {% for account in accounts %}{% include 'accounts/includes/card.html' %}
+  {% empty %}<div class="empty-state"><h2>Счета не найдены</h2><p>Измените фильтр или добавьте счёт с начальным балансом.</p><a class="button secondary" href="{% url 'accounts:create' %}">Добавить счёт</a></div>{% endfor %}
+</div>
+{% endblock %}

@@ -90,7 +90,7 @@ def test_filters_affect_displayed_results(client):
     assert "Интернет" not in text
     text = client.get("/operations/?month=2000-01").content.decode()
     assert "Операций не найдено" in text
-    assert "0.00 руб." in text
+    assert "0,00" in text
     text = client.get("/accounts/?max_balance=8000").content.decode()
     assert "Наличные" in text
     assert "Основная карта" not in text

@@ -1,4 +1,11 @@
 {% extends 'base.html' %}
+{% load ui %}
 {% block title %}{{ title }}{% endblock %}
-{% block content %}<div class="page-heading"><h1>{{ title }}</h1><a class="button" href="{% url create_url %}">Добавить</a></div>
-<div class="directory-grid">{% for item in items %}<article class="panel directory-card"><h2>{{ item.name }}</h2><div class="actions"><a href="{% url edit_url item.pk %}">Изменить</a><a href="{% url delete_url item.pk %}">Удалить</a></div></article>{% empty %}<p class="empty-state">Пока нет записей.</p>{% endfor %}</div>{% endblock %}
+{% block section %}{{ title }}{% endblock %}
+{% block content %}
+<div class="page-heading"><div><h1>{{ title }}</h1><p class="muted">Записи, связанные со счетами и расходами.</p></div><a class="button secondary" href="{% url create_url %}">{% icon 'plus' %} Добавить</a></div>
+<div class="panel directory-list">
+  {% for item in items %}<article class="directory-row"><h2>{{ item.name }}</h2><div class="directory-actions"><a href="{% url edit_url item.pk %}" aria-label="Изменить {{ item.name }}">Изменить</a><a class="danger-link" href="{% url delete_url item.pk %}" aria-label="Удалить {{ item.name }}">Удалить</a></div></article>
+  {% empty %}<div class="empty-state"><h2>Пока нет записей</h2><p>Добавьте первую запись, чтобы использовать её при учёте расходов.</p><a class="button secondary" href="{% url create_url %}">Добавить</a></div>{% endfor %}
+</div>
+{% endblock %}

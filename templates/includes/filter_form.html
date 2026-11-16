@@ -1,6 +1,11 @@
-{% if form.errors %}<div class="error-message" role="alert">Проверьте параметры фильтра: {% for field in form %}{% for error in field.errors %}{{ field.label }}: {{ error }} {% endfor %}{% endfor %}{{ form.non_field_errors }}</div>{% endif %}
-<form method="get" class="panel filters">
-  {% for field in form %}<div class="field">{{ field.label_tag }}{{ field }}</div>{% endfor %}
-  <button type="submit" class="button">Применить</button>
-  <a href="{{ clear_url }}" class="button secondary" data-clear-filters="{{ clear_url }}">Сбросить</a>
-</form>
+{% load ui %}
+{% if form.errors %}
+<div class="error-message" role="alert"><strong>Проверьте параметры фильтра.</strong>{% for field in form %}{% for error in field.errors %}<p>{{ field.label }}: {{ error }}</p>{% endfor %}{% endfor %}{{ form.non_field_errors }}</div>
+{% endif %}
+<details class="filter-panel" open>
+  <summary>{% icon 'filter' %}<span>Поиск и фильтры</span>{% icon 'chevron' %}</summary>
+  <form method="get" class="filters">
+    {% for field in form %}<div class="field{% if field.name == 'query' %} field--search{% endif %}">{{ field.label_tag }}{{ field }}</div>{% endfor %}
+    <div class="filter-actions"><button type="submit" class="button secondary">Применить</button><a href="{{ clear_url }}" class="reset-link">Сбросить фильтры</a></div>
+  </form>
+</details>

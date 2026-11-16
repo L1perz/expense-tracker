@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }}{% endblock %}
 {% block content %}
-<h1>{{ title }}</h1><form method="post" class="panel edit-form">
-{% csrf_token %}<p>{{ object }}</p>
-{% if error %}<p class="error-message" role="alert">{{ error }}</p>{% else %}<p>Удалить эту запись? Это действие нельзя отменить.</p><button class="button" type="submit">{{ button }}</button>{% endif %}
-<a class="button secondary" href="{% url cancel_url %}">Вернуться к списку</a></form>
+<div class="page-heading"><h1>{{ title }}</h1></div>
+<form method="post" class="panel edit-form">
+  {% csrf_token %}
+  <h2>{{ object }}</h2>
+  {% if error %}<div class="error-message" role="alert">{{ error }}</div>
+  {% else %}<p class="muted">Удалить эту запись? Это действие нельзя отменить.</p>{% endif %}
+  <div class="form-actions">{% if not error %}<button class="button danger" type="submit" data-pending-label="Удаление…">{{ button }}</button>{% endif %}<a class="button secondary" href="{% url cancel_url %}">Вернуться к списку</a></div>
+</form>
 {% endblock %}
