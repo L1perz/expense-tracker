@@ -3,7 +3,10 @@
 from django.db.models import Count, F, Max, Min, Q, Sum
 from django.db.models.functions import Coalesce, TruncMonth
 
-from .models import Account, Category, Operation, User
+from accounts.models import Account
+from categories.models import Category
+from operations.models import Operation
+from users.models import User
 
 
 def accounts():

@@ -4,7 +4,10 @@ from django.utils.text import smart_split, unescape_string_literal
 
 from .db_functions import search_text
 from .forms import AccountForm, CategoryForm, OperationForm
-from .models import Account, Category, Operation, User
+from accounts.models import Account
+from categories.models import Category
+from operations.models import Operation
+from users.models import User
 from utils import format_money
 
 

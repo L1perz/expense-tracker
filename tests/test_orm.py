@@ -16,7 +16,10 @@ from django.utils import timezone
 from PIL import Image
 
 from ledger.forms import OperationForm
-from ledger.models import Account, Category, Operation, User
+from accounts.models import Account
+from categories.models import Category
+from operations.models import Operation
+from users.models import User
 from ledger.queries import operations, statistics
 
 pytestmark = pytest.mark.django_db
@@ -291,10 +294,10 @@ def test_admin_lists_forms_and_images(client, settings, tmp_path):
     client.force_login(admin)
     for path in (
         "/admin/",
-        "/admin/ledger/account/",
-        "/admin/ledger/account/add/",
-        "/admin/ledger/operation/1/change/",
-        "/admin/ledger/account/1/change/",
+        "/admin/accounts/account/",
+        "/admin/accounts/account/add/",
+        "/admin/operations/operation/1/change/",
+        "/admin/accounts/account/1/change/",
     ):
         assert client.get(path).status_code == 200, path
     output = io.BytesIO()

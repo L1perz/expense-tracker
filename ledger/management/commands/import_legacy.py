@@ -9,7 +9,10 @@ from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 from django.db import IntegrityError, transaction
 
-from ledger.models import Account, Category, Operation, User
+from accounts.models import Account
+from categories.models import Category
+from operations.models import Operation
+from users.models import User
 from storage import load_project
 
 

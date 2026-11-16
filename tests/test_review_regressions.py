@@ -10,7 +10,10 @@ from django.test import Client
 from django.utils import timezone
 
 from ledger.forms import AccountForm
-from ledger.models import Account, Category, Operation, User
+from accounts.models import Account
+from categories.models import Category
+from operations.models import Operation
+from users.models import User
 
 pytestmark = pytest.mark.django_db
 
@@ -25,8 +28,11 @@ def wallet():
 
 def buy(wallet):
     return Operation.objects.create(
-        user=wallet[0], account=wallet[1], category=wallet[2],
-        amount=25_000, description="Обед",
+        user=wallet[0],
+        account=wallet[1],
+        category=wallet[2],
+        amount=25_000,
+        description="Обед",
     )
 
 
@@ -100,9 +106,11 @@ def test_stale_cancel_preserves_latest_details_and_refunds_current_account(walle
 @pytest.fixture
 def admin_client():
     client = Client()
-    client.force_login(get_user_model().objects.create_superuser(
-        "review-owner", "", "test-only-password"
-    ))
+    client.force_login(
+        get_user_model().objects.create_superuser(
+            "review-owner", "", "test-only-password"
+        )
+    )
     return client
 
 
@@ -110,14 +118,20 @@ def admin_client():
 def test_admin_duplicate_category_shows_field_error(wallet, admin_client, edit):
     other = Category.objects.create(name="Дом")
     path = f"{other.pk}/change/" if edit else "add/"
-    response = admin_client.post(f"/admin/ledger/category/{path}", {
-        "name": "  ЕДА  ", "operations-TOTAL_FORMS": "0",
-        "operations-INITIAL_FORMS": "0", "operations-MIN_NUM_FORMS": "0",
-        "operations-MAX_NUM_FORMS": "1000",
-    })
+    response = admin_client.post(
+        f"/admin/categories/category/{path}",
+        {
+            "name": "  ЕДА  ",
+            "operations-TOTAL_FORMS": "0",
+            "operations-INITIAL_FORMS": "0",
+            "operations-MIN_NUM_FORMS": "0",
+            "operations-MAX_NUM_FORMS": "1000",
+        },
+    )
     assert response.status_code == 200
-    assert "Такая категория уже есть." in (
-        response.context["adminform"].form.errors["name"]
+    assert (
+        "Такая категория уже есть."
+        in (response.context["adminform"].form.errors["name"])
     )
     assert Category.objects.count() == 2
     other.refresh_from_db()
@@ -125,11 +139,16 @@ def test_admin_duplicate_category_shows_field_error(wallet, admin_client, edit):
 
 
 def test_admin_category_allows_own_case_change(wallet, admin_client):
-    response = admin_client.post(f"/admin/ledger/category/{wallet[2].pk}/change/", {
-        "name": "ЕДА", "operations-TOTAL_FORMS": "0",
-        "operations-INITIAL_FORMS": "0", "operations-MIN_NUM_FORMS": "0",
-        "operations-MAX_NUM_FORMS": "1000",
-    })
+    response = admin_client.post(
+        f"/admin/categories/category/{wallet[2].pk}/change/",
+        {
+            "name": "ЕДА",
+            "operations-TOTAL_FORMS": "0",
+            "operations-INITIAL_FORMS": "0",
+            "operations-MIN_NUM_FORMS": "0",
+            "operations-MAX_NUM_FORMS": "1000",
+        },
+    )
     assert response.status_code == 302
     wallet[2].refresh_from_db()
     assert wallet[2].name == "ЕДА"
@@ -145,10 +164,16 @@ def test_cyrillic_search_matches_every_field(wallet, query):
     assert list(response.context["operations"]) == [operation]
 
 
-@pytest.mark.parametrize("description,query", [
-    ("Ёлка", "ёлКА"), ("Straße", "STRASSE"),
-    ("Скидка 10%", "10%"), ("Платёж_1", "ж_1"), ("Путь\\чека", "\\ч"),
-])
+@pytest.mark.parametrize(
+    "description,query",
+    [
+        ("Ёлка", "ёлКА"),
+        ("Straße", "STRASSE"),
+        ("Скидка 10%", "10%"),
+        ("Платёж_1", "ж_1"),
+        ("Путь\\чека", "\\ч"),
+    ],
+)
 def test_unicode_search_and_literal_symbols(wallet, description, query):
     operation = buy(wallet)
     operation.description = description
@@ -183,15 +208,31 @@ def test_unicode_search_function_is_registered_on_new_connection():
         another.close()
 
 
-@pytest.mark.parametrize("model,query", [
-    ("operation", "обед"), ("operation", "карта"),
-    ("operation", "еда"), ("operation", "тест"),
-    ("account", "карта"), ("account", "тест"),
-    ("category", "еда"), ("user", "тест"),
-])
+@pytest.mark.parametrize(
+    "model,query",
+    [
+        ("operation", "обед"),
+        ("operation", "карта"),
+        ("operation", "еда"),
+        ("operation", "тест"),
+        ("account", "карта"),
+        ("account", "тест"),
+        ("category", "еда"),
+        ("user", "тест"),
+    ],
+)
 def test_admin_search_uses_unicode_for_all_models(wallet, admin_client, model, query):
     buy(wallet)
-    response = admin_client.get(f"/admin/ledger/{model}/", {"q": query})
+    app = {
+        "operation": "operations",
+        "account": "accounts",
+        "category": "categories",
+        "user": "users",
+    }[model]
+    response = admin_client.get(
+        f"/admin/{app}/{model}/",
+        {"q": query},
+    )
     assert response.status_code == 200
     assert response.context["cl"].queryset.count() == 1
 
@@ -200,7 +241,7 @@ def test_admin_search_preserves_words_phrases_and_filters(wallet, admin_client):
     operation = buy(wallet)
     operation.description = "Обед с другом"
     operation.save()
-    url = "/admin/ledger/operation/"
+    url = "/admin/operations/operation/"
     response = admin_client.get(url, {"q": '"ОБЕД С" ДРУГОМ'})
     assert list(response.context["cl"].queryset) == [operation]
     response = admin_client.get(url, {"q": '"С ОБЕД"'})

@@ -2,7 +2,10 @@
 
 from django import forms
 
-from ledger.models import Account, Category, Operation, User
+from accounts.models import Account
+from categories.models import Category
+from operations.models import Operation
+from users.models import User
 from homepage.forms import clean_money
 from utils import validate_month
 

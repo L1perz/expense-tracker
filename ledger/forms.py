@@ -2,7 +2,11 @@ from decimal import Decimal
 
 from django import forms
 
-from .models import MAX_MONEY, Account, Category, Operation, User
+from ledger.constants import MAX_MONEY
+from accounts.models import Account
+from categories.models import Category
+from operations.models import Operation
+from users.models import User
 
 
 class StyledForm:

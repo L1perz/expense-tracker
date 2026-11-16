@@ -4,7 +4,8 @@ import pytest
 from django.contrib.staticfiles import finders
 from django.db import OperationalError
 from unittest.mock import patch
-from ledger.models import Operation, User
+from operations.models import Operation
+from users.models import User
 
 
 @pytest.mark.parametrize(

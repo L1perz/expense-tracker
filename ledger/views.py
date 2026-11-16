@@ -6,14 +6,17 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
 from .forms import AccountForm, CategoryForm, OperationForm, UserForm
-from .models import Account, Category, Operation, User
+from accounts.models import Account
+from categories.models import Category
+from operations.models import Operation
+from users.models import User
 
 
 @require_http_methods(["GET", "POST"])
 def edit(request, kind, pk=None):
     model, form_type, destination, title = {
-        "user": (User, UserForm, "homepage:users", "пользователя"),
-        "category": (Category, CategoryForm, "homepage:categories", "категорию"),
+        "user": (User, UserForm, "users:list", "пользователя"),
+        "category": (Category, CategoryForm, "categories:list", "категорию"),
         "account": (Account, AccountForm, "accounts:list", "счёт"),
         "operation": (Operation, OperationForm, "operations:list", "расход"),
     }[kind]
@@ -56,8 +59,8 @@ def edit(request, kind, pk=None):
 @require_http_methods(["GET", "POST"])
 def delete(request, kind, pk):
     model, destination = {
-        "user": (User, "homepage:users"),
-        "category": (Category, "homepage:categories"),
+        "user": (User, "users:list"),
+        "category": (Category, "categories:list"),
         "account": (Account, "accounts:list"),
     }[kind]
     instance = get_object_or_404(model, pk=pk)

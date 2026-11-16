@@ -6,7 +6,7 @@
   <a href="{% url 'operations:list' %}" {% if request.resolver_match.namespace == 'operations' and current != 'operations:statistics' %}aria-current="page"{% endif %}>{% icon 'operations' %}<span>Операции</span></a>
   <a href="{% url 'operations:statistics' %}" {% if current == 'operations:statistics' %}aria-current="page"{% endif %}>{% icon 'statistics' %}<span>Статистика</span></a>
   <div class="nav-divider" aria-hidden="true"></div>
-  <a href="{% url 'homepage:users' %}" {% if current == 'homepage:users' or current == 'homepage:user_create' or current == 'homepage:user_edit' %}aria-current="page"{% endif %}>{% icon 'users' %}<span>Пользователи</span></a>
-  <a href="{% url 'homepage:categories' %}" {% if current == 'homepage:categories' or current == 'homepage:category_create' or current == 'homepage:category_edit' %}aria-current="page"{% endif %}>{% icon 'category' %}<span>Категории</span></a>
+  <a href="{% url 'users:list' %}" {% if current == 'users:list' or current == 'users:create' or current == 'users:edit' %}aria-current="page"{% endif %}>{% icon 'users' %}<span>Пользователи</span></a>
+  <a href="{% url 'categories:list' %}" {% if current == 'categories:list' or current == 'categories:create' or current == 'categories:edit' %}aria-current="page"{% endif %}>{% icon 'category' %}<span>Категории</span></a>
   {% endwith %}
 </nav>

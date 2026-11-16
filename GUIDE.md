@@ -2,10 +2,21 @@
 
 ## Данные
 
-`ledger.User` владеет счетами `Account`. Расход `Operation` связан с пользователем,
+`users.User` владеет счетами `Account`. Расход `Operation` связан с пользователем,
 счётом и категорией `Category`. Связи используют `ForeignKey(PROTECT)` и обратные
 имена `accounts` и `operations`. Модели наследуют `django.db.models.Model`.
-Типы полей и ограничения находятся в `ledger/models.py`.
+Каждая сущность имеет своё Django-приложение: `users/models.py`,
+`categories/models.py`, `accounts/models.py`, `operations/models.py`.
+`ledger` содержит общие запросы, обработчики и команду импорта. Его `models.py`
+сохраняет совместимые импорты прежних путей, но не определяет модели.
+
+Таблицы по-прежнему называются `ledger_user`, `ledger_category`, `ledger_account`
+и `ledger_operation`: явный `Meta.db_table` позволяет перенести модели без
+пересоздания таблиц. Начальные миграции приложений обновляют состояние Django
+через `SeparateDatabaseAndState`; `ledger.0003` завершает перенос и обновляет
+ContentType. Сохраняются ID типов, права пользователей и групп, журнал админки,
+ID записей, балансы, slug и пути изображений. Старые миграции не изменены.
+Обновление существующей базы и откат проверяются в `tests/test_migrations.py`.
 
 Идентификаторы формирует Django. Все суммы хранятся целыми копейками.
 Формы преобразуют рубли через `Decimal`. Поле `Operation.is_large` вычисляет
