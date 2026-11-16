@@ -161,7 +161,7 @@ def test_cyrillic_search_matches_every_field(wallet, query):
     assert list(Operation.objects.search(query)) == [operation]
     response = Client().get("/operations/", {"query": query})
     assert response.status_code == 200
-    assert list(response.context["operations"]) == [operation]
+    assert [row["id"] for row in response.context["operations"]] == [operation.pk]
 
 
 @pytest.mark.parametrize(

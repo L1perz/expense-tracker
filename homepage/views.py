@@ -5,7 +5,7 @@ from ledger import queries as data
 
 def index(request):
     accounts = data.accounts()
-    operations = data.operations().active()
+    operations = data.operation_rows(data.operations().active())
     return render(
         request,
         "homepage/index.html",

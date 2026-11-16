@@ -6,11 +6,11 @@
     <tbody>
       {% for operation in operations %}
       <tr>
-        <td class="operation-cell"><a class="operation-link" href="{{ operation.get_absolute_url }}">{{ operation.description|default:'Без описания' }}</a><small class="row-subtitle">Операция №{{ operation.id }}</small></td>
+        <td class="operation-cell"><a class="operation-link" href="{% url 'operations:detail' operation.id %}">{{ operation.description|default:'Без описания' }}</a><small class="row-subtitle">Операция №{{ operation.id }}</small></td>
         <td class="category-cell"><span class="category-name">{{ operation.category_name }}</span></td>
-        <td class="account-cell"><a href="{{ operation.account.get_absolute_url }}">{{ operation.account_name }}</a><small class="row-subtitle">{{ operation.user_name }}</small></td>
+        <td class="account-cell"><a href="{% url 'accounts:detail_slug' operation.account_slug %}">{{ operation.account_name }}</a><small class="row-subtitle">{{ operation.user_name }}</small></td>
         <td class="date-cell nowrap">{{ operation.date|date:'d.m.Y' }}</td>
-        <td class="status-cell"><span class="status status--{{ operation.status }}">{{ operation.get_status_display }}</span></td>
+        <td class="status-cell"><span class="status status--{{ operation.status }}">{{ operation.status_label }}</span></td>
         <td class="amount-cell align-right amount{% if operation.status == 'cancelled' %} amount--cancelled{% endif %}">{% if operation.status == 'completed' %}−{% endif %}{{ operation.amount|rubles }} <span class="currency">₽</span></td>
       </tr>
       {% empty %}<tr class="empty-row"><td colspan="6"><div class="empty-state"><h3>Операций не найдено</h3><p>Попробуйте изменить фильтры или добавьте новый расход.</p><a class="button secondary" href="{% url 'operations:create' %}">Добавить расход</a></div></td></tr>{% endfor %}

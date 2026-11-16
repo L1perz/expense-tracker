@@ -2,10 +2,10 @@
 
 | Назначение | Файл |
 | --- | --- |
-| Модели, связи, ограничения, статусы | `ledger/models.py` |
+| Модели, связи, ограничения, статусы | `users/models.py`, `categories/models.py`, `accounts/models.py`, `operations/models.py` |
 | Списание и возврат в одной транзакции | `Operation.save()`, `Operation.cancel()` |
 | Запросы обзора и статистики | `ledger/queries.py` |
-| Условия статусов и поиск | `OperationQuerySet` в `ledger/models.py` |
+| Условия статусов и поиск | `OperationQuerySet` в `operations/models.py` |
 | Unicode-поиск SQLite и подключение функции | `ledger/db_functions.py`, `ledger/apps.py` |
 | GET-фильтры, дата и сортировка | `operations/forms.py` |
 | Список, фильтры, `Paginator` | `operations/views.py` |
@@ -13,10 +13,11 @@
 | GET/POST, создание, изменение, отмена | `ledger/views.py` |
 | CSRF, ошибки, подсказки | `ledger/templates/ledger/form.html` |
 | Сохранение параметров страниц | `templates/includes/pagination.html` |
-| Админка, inline, поиск | `ledger/admin.py` |
+| Админка и inline | `users/admin.py`, `categories/admin.py`, `accounts/admin.py`, `operations/admin.py` |
+| Общая база поиска админки | `ledger/admin.py` |
 | Общие данные шаблонов | `ledger/context_processors.py` |
 | Безопасный перенос источников | `ledger/management/commands/import_legacy.py` |
-| Схема и преобразование имён | `ledger/migrations/` |
+| Схема, преобразование имён и перенос моделей | `ledger/migrations/`, `users/migrations/`, `categories/migrations/`, `accounts/migrations/`, `operations/migrations/` |
 
 ## Запросы приложения
 
@@ -54,8 +55,12 @@
     — группировка по месяцам.
 21. `aggregate(completed=Count('pk', filter=Q(...)), ...)` — количества по статусам.
 22. `Paginator(operations, 5).get_page(page)` — подсчёт и выбор текущей страницы.
+23. `operation_rows(operations)` — аннотации `F` связанных названий и slug,
+    `Case` для подписи статуса и `values()` только полей таблицы. Используется
+    в списке расходов, обзоре и карточке счёта; шаблон получает словари.
 
-Для просмотра SQL: `python manage.py shell`, импортировать модели из `ledger.models`,
+Для просмотра SQL: `python manage.py shell`, импортировать `Operation` из
+`operations.models` или другие модели из их приложений,
 создать QuerySet и вывести `print(queryset.query)`. Чтение связанных объектов можно
 проверить в тесте с `CaptureQueriesContext` либо на вкладке SQL Debug Toolbar.
 

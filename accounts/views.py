@@ -32,7 +32,7 @@ def account_detail(request, account_id=None, slug=None):
         data.accounts(),
         **({"pk": account_id} if account_id is not None else {"slug": slug}),
     )
-    operations = data.operations().filter(account=account)
+    operations = data.operation_rows(data.operations().filter(account=account))
     return render(
         request,
         "accounts/detail.html",

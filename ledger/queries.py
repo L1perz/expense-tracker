@@ -1,6 +1,6 @@
 """Запросы обзора, поиска и статистики."""
 
-from django.db.models import Count, F, Max, Min, Q, Sum
+from django.db.models import Case, CharField, Count, F, Max, Min, Q, Sum, Value, When
 from django.db.models.functions import Coalesce, TruncMonth
 
 from accounts.models import Account
@@ -18,6 +18,36 @@ def operations():
         user_name=F("user__name"),
         account_name=F("account__name"),
         category_name=F("category__name"),
+    )
+
+
+def operation_rows(queryset):
+    """Поля таблицы с именами связанных сущностей и подписями статусов."""
+    return queryset.annotate(
+        user_name=F("user__name"),
+        account_name=F("account__name"),
+        account_slug=F("account__slug"),
+        category_name=F("category__name"),
+        status_label=Case(
+            *[
+                When(status=value, then=Value(label))
+                for value, label in Operation.Status.choices
+            ],
+            default=Value(""),
+            output_field=CharField(),
+        ),
+    ).values(
+        "id",
+        "description",
+        "date",
+        "amount",
+        "status",
+        "status_label",
+        "user_name",
+        "account_id",
+        "account_name",
+        "account_slug",
+        "category_name",
     )
 
 

@@ -39,7 +39,9 @@ def operation_list(request):
     else:
         operations = operations.none()
     total = operations.completed().aggregate(total=Coalesce(Sum("amount"), 0))["total"]
-    page = Paginator(operations, 5).get_page(request.GET.get("page"))
+    page = Paginator(data.operation_rows(operations), 5).get_page(
+        request.GET.get("page")
+    )
     params = request.GET.copy()
     params.pop("page", None)
     return render(
