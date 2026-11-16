@@ -5,7 +5,10 @@ from django.db.models.deletion import ProtectedError
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
-from .forms import AccountForm, CategoryForm, OperationForm, UserForm
+from accounts.forms import AccountForm
+from categories.forms import CategoryForm
+from operations.forms import OperationForm
+from users.forms import UserForm
 from accounts.models import Account
 from categories.models import Category
 from operations.models import Operation

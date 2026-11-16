@@ -9,7 +9,7 @@ from django.db import connection
 from django.test import Client
 from django.utils import timezone
 
-from ledger.forms import AccountForm
+from accounts.forms import AccountForm
 from accounts.models import Account
 from categories.models import Category
 from operations.models import Operation

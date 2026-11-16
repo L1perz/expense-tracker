@@ -15,7 +15,7 @@ from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 from PIL import Image
 
-from ledger.forms import OperationForm
+from operations.forms import OperationForm
 from accounts.models import Account
 from categories.models import Category
 from operations.models import Operation

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from ledger.forms import AccountForm
+from accounts.forms import AccountForm
 from operations.admin import OperationInline
 from utils import format_money
 

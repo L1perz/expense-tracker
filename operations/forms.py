@@ -1,6 +1,11 @@
-"""Проверка GET-параметров перед передачей значений в SQL."""
+"""Фильтрация, создание и редактирование расходов."""
+
+from decimal import Decimal
 
 from django import forms
+
+from ledger.constants import MAX_MONEY
+from ledger.forms import StyledForm
 
 from accounts.models import Account
 from categories.models import Category
@@ -90,3 +95,73 @@ class StatisticsFilterForm(MonthFilterForm):
     def clean_min_total(self):
         value = self.cleaned_data["min_total"]
         return clean_money(value) if value else 0
+
+
+class OperationForm(StyledForm, forms.ModelForm):
+    amount = forms.DecimalField(
+        label="Сумма, руб.",
+        max_digits=12,
+        decimal_places=2,
+        localize=True,
+        min_value=Decimal("0.01"),
+        help_text="Например, 750,50. Не более двух знаков после запятой.",
+    )
+
+    class Meta:
+        model = Operation
+        fields = (
+            "user",
+            "account",
+            "category",
+            "amount",
+            "date",
+            "description",
+            "status",
+        )
+        widgets = {
+            "date": forms.DateInput(format="%Y-%m-%d", attrs={"type": "date"}),
+            "description": forms.TextInput(
+                attrs={"placeholder": "Например, продукты на неделю"}
+            ),
+        }
+        help_texts = {
+            "status": "Оплаченный расход списывает деньги, отменённый возвращает их."
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["account"].queryset = Account.objects.select_related("user")
+        if self.instance.pk:
+            self.initial["amount"] = Decimal(self.instance.amount) / 100
+
+    def clean_amount(self):
+        amount = int(self.cleaned_data["amount"] * 100)
+        if amount > MAX_MONEY:
+            raise forms.ValidationError("Слишком большая сумма.")
+        return amount
+
+    def clean(self):
+        data = super().clean()
+        account, user = data.get("account"), data.get("user")
+        if account and user and account.user_id != user.pk:
+            self.add_error("account", "Счёт не принадлежит выбранному пользователю.")
+        if (
+            account
+            and data.get("amount")
+            and data.get("status") == Operation.Status.COMPLETED
+        ):
+            available = account.balance
+            old = (
+                Operation.objects.filter(pk=self.instance.pk).first()
+                if self.instance.pk
+                else None
+            )
+            if (
+                old
+                and old.account_id == account.pk
+                and old.status == Operation.Status.COMPLETED
+            ):
+                available += old.amount
+            if data["amount"] > available:
+                raise forms.ValidationError("На выбранном счёте недостаточно денег.")
+        return data

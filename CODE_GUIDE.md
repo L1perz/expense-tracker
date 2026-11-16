@@ -9,7 +9,7 @@
 | Unicode-поиск SQLite и подключение функции | `ledger/db_functions.py`, `ledger/apps.py` |
 | GET-фильтры, дата и сортировка | `operations/forms.py` |
 | Список, фильтры, `Paginator` | `operations/views.py` |
-| `ModelForm`, рубли, изображения | `ledger/forms.py` |
+| `ModelForm`, рубли, изображения | `users/forms.py`, `categories/forms.py`, `accounts/forms.py`, `operations/forms.py` |
 | GET/POST, создание, изменение, отмена | `ledger/views.py` |
 | CSRF, ошибки, подсказки | `ledger/templates/ledger/form.html` |
 | Сохранение параметров страниц | `templates/includes/pagination.html` |

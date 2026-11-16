@@ -58,7 +58,9 @@ Unicode в функциях сравнения SQLite. Миграция `0002` �
 Путь запроса: `URL → view → Form/ModelForm → ORM → шаблон`.
 `ledger/queries.py` содержит сводки и группировки, `OperationQuerySet` —
 повторно используемые условия и загрузку связей. `operations/forms.py` проверяет
-GET-параметры; `ledger/forms.py` создаёт и изменяет модели.
+GET-параметры. Формы создания и изменения моделей находятся в `users/forms.py`,
+`categories/forms.py`, `accounts/forms.py` и `operations/forms.py`;
+`ledger/forms.py` содержит только общее оформление полей.
 
 GET показывает форму. POST связывает её с данными и файлами. После проверки
 `is_valid()` вызывается `form.save()`, затем перенаправление на карточку.

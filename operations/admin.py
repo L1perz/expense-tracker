@@ -1,5 +1,5 @@
 from django.contrib import admin
-from ledger.forms import OperationForm
+from operations.forms import OperationForm
 
 from ledger.admin import UnicodeSearchAdmin
 from .models import Operation
