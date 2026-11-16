@@ -1,0 +1,4 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}<div class="page-heading"><h1>{{ title }}</h1><a class="button" href="{% url create_url %}">Добавить</a></div>
+<div class="directory-grid">{% for item in items %}<article class="panel directory-card"><h2>{{ item.name }}</h2><div class="actions"><a href="{% url edit_url item.pk %}">Изменить</a><a href="{% url delete_url item.pk %}">Удалить</a></div></article>{% empty %}<p class="empty-state">Пока нет записей.</p>{% endfor %}</div>{% endblock %}

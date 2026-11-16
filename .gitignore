@@ -6,6 +6,9 @@ __pycache__/
 .idea/
 .vscode/
 .DS_Store
+media/
+*.sqlite3
+*.sqlite3-journal
 /data/expenses.json
 /data/*.sqlite
 /data/*.sqlite-*

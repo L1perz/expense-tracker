@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1>{{ title }}</h1><form method="post" class="panel edit-form">
+{% csrf_token %}<p>{{ object }}</p>
+{% if error %}<p class="error-message" role="alert">{{ error }}</p>{% else %}<p>Удалить эту запись? Это действие нельзя отменить.</p><button class="button" type="submit">{{ button }}</button>{% endif %}
+<a class="button secondary" href="{% url cancel_url %}">Вернуться к списку</a></form>
+{% endblock %}

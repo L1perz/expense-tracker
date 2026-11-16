@@ -2,14 +2,16 @@
 
 from django import forms
 
-from db import repository
+from ledger.models import Account, Category, Operation, User
 from homepage.forms import clean_money
 from utils import validate_month
 
 
 class MonthFilterForm(forms.Form):
     month = forms.CharField(
-        label="Месяц", required=False, max_length=7,
+        label="Месяц",
+        required=False,
+        max_length=7,
         widget=forms.TextInput(attrs={"type": "month"}),
     )
 
@@ -24,25 +26,61 @@ class MonthFilterForm(forms.Form):
 
 
 class OperationFilterForm(MonthFilterForm):
+    date = forms.DateField(
+        label="Дата", required=False, widget=forms.DateInput(attrs={"type": "date"})
+    )
+    account_id = forms.TypedChoiceField(
+        label="Счёт", required=False, coerce=int, empty_value=None
+    )
+    status = forms.ChoiceField(
+        label="Статус",
+        required=False,
+        choices=[("", "Кроме отменённых"), ("all", "Все")]
+        + list(Operation.Status.choices),
+    )
+    sort = forms.ChoiceField(
+        label="Порядок",
+        required=False,
+        choices=[
+            ("", "Сначала новые"),
+            ("date", "Сначала старые"),
+            ("amount", "Сумма по возрастанию"),
+            ("-amount", "Сумма по убыванию"),
+            ("account", "По счёту"),
+            ("user", "По пользователю"),
+        ],
+    )
     user_id = forms.TypedChoiceField(
-        label="Пользователь", required=False, coerce=int, empty_value=None,
+        label="Пользователь",
+        required=False,
+        coerce=int,
+        empty_value=None,
     )
     category_id = forms.TypedChoiceField(
-        label="Категория", required=False, coerce=int, empty_value=None,
+        label="Категория",
+        required=False,
+        coerce=int,
+        empty_value=None,
     )
     query = forms.CharField(label="Описание содержит", required=False, max_length=200)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["user_id"].choices = [("", "Все пользователи")] + [
-            (item["id"], item["name"]) for item in repository.get_users()]
-        self.fields["category_id"].choices = [("", "Все категории")] + [
-            (item["id"], item["name"]) for item in repository.get_categories()]
+        self.fields["user_id"].choices = [("", "Все пользователи")] + list(
+            User.objects.values_list("id", "name")
+        )
+        self.fields["category_id"].choices = [("", "Все категории")] + list(
+            Category.objects.values_list("id", "name")
+        )
+        self.fields["account_id"].choices = [("", "Все счета")] + list(
+            Account.objects.values_list("id", "name")
+        )
 
 
 class StatisticsFilterForm(MonthFilterForm):
     min_total = forms.CharField(
-        label="Расходы категории от, руб.", required=False,
+        label="Расходы категории от, руб.",
+        required=False,
         widget=forms.TextInput(attrs={"inputmode": "decimal", "placeholder": "0"}),
     )
 

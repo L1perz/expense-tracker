@@ -6,6 +6,7 @@
 <div class="page-heading"><div><p class="eyebrow">Картина расходов</p><h1>Статистика</h1><p class="muted">Сравнивайте категории и следите за расходами по месяцам.</p></div></div>
 {% url 'operations:statistics' as clear_url %}{% include 'includes/filter_form.html' %}
 {% if not form.errors %}
+<p class="muted">Оплачено: {{ statuses.completed }} · Запланировано: {{ statuses.pending }} · Отменено: {{ statuses.cancelled }}. В суммы расходов входят только оплаченные операции.</p>
 <section class="summary-grid" aria-label="Показатели за выбранный период">
   <div class="summary-card featured"><span>Расходы за {% if form.cleaned_data.month %}{{ form.cleaned_data.month }}{% else %}всё время{% endif %}</span><strong>{{ summary.total|money }}</strong><small>{{ summary.count }} операций</small></div>
   <div class="summary-card"><span>Самая крупная трата</span><strong>{{ summary.maximum|money }}</strong><small>За выбранный период</small></div>

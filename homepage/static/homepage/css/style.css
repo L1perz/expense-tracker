@@ -2,6 +2,12 @@
   --ink: #1c332c; --muted: #6b786e; --green: #244b3d;
   --lime: #dff6a5; --paper: #f7f8f4; --line: #e3e8e1; --radius: 17px;
 }
+.quick-actions, .actions, .pagination { display:flex; align-items:center; flex-wrap:wrap; gap:16px; margin:0 0 24px; }
+.edit-form { max-width:650px; padding:28px; display:grid; gap:20px; }
+.edit-form .field { min-width:0; }
+.field-error, .errorlist { color:#923b28; }
+.notice { padding:14px 18px; background:#e5edd9; border-radius:9px; margin-bottom:20px; }
+.account-image { max-width:320px; max-height:180px; object-fit:cover; border-radius:12px; margin-bottom:20px; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.5 "Segoe UI", Arial, sans-serif; }
 a { color: var(--green); text-decoration: none; }

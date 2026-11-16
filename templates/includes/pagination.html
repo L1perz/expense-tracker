@@ -1,0 +1,5 @@
+{% if page_obj.has_other_pages %}<nav class="pagination" aria-label="Страницы операций">
+{% if page_obj.has_previous %}<a class="button secondary" href="?{{ query_params }}&amp;page={{ page_obj.previous_page_number }}">← Назад</a>{% endif %}
+<span>Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+{% if page_obj.has_next %}<a class="button secondary" href="?{{ query_params }}&amp;page={{ page_obj.next_page_number }}">Далее →</a>{% endif %}
+</nav>{% endif %}

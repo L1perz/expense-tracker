@@ -4,19 +4,16 @@ import os
 
 import django
 import pytest
-from django.test import Client, override_settings
+from django.core.management import call_command
 
-from db.database import BASE_DIR
-from db.import_json import import_json
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "expense_tracker.settings")
 django.setup()
 
 
 @pytest.fixture
-def client(tmp_path):
-    database = tmp_path / "web.sqlite"
-    import_json(BASE_DIR / "data", database)
-    with override_settings(ALLOWED_HOSTS=["testserver"], DEBUG=False,
-                           EXPENSE_DB_PATH=database):
-        yield Client()
+def client(db, client, settings):
+    settings.ALLOWED_HOSTS = ["testserver"]
+    settings.DEBUG = False
+    call_command("import_legacy", verbosity=0)
+    return client

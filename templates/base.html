@@ -7,9 +7,16 @@
 <link rel="stylesheet" href="{% static 'homepage/css/style.css' %}">
 <script src="{% static 'homepage/js/main.js' %}" defer></script></head><body>
 <a class="skip-link" href="#content">Перейти к содержимому</a>
-<aside class="sidebar"><a class="brand" href="{% url 'homepage:index' %}"><img src="{% static 'homepage/img/logo.svg' %}" alt="" width="36" height="36"><span>Расходы<small>Личные финансы</small></span></a>
+<aside class="sidebar"><a class="brand" href="{% url 'homepage:index' %}"><img src="{% static 'homepage/img/logo.svg' %}" alt="" width="36" height="36"><span>{{ site_name }}<small>{{ site_description }}</small></span></a>
 {% include 'includes/navigation.html' %}
 <div class="sidebar-note">● Система учёта расходов<br><span>Баланс, операции и аналитика</span></div></aside>
 <div class="workspace"><header class="topbar"><span>Личные финансы / {% block section %}Обзор{% endblock %}</span><time>{% now 'd.m.Y' %}</time></header>
-<main id="content" class="page-content">{% block content %}{% endblock %}</main>
+<main id="content" class="page-content">
+{% for message in messages %}<div class="notice" role="status">{{ message }}</div>{% endfor %}
+<div class="quick-actions"><a class="button" href="{% url 'operations:create' %}">+ Расход</a><a class="button secondary" href="{% url 'accounts:create' %}">+ Счёт</a><a href="{% url 'admin:index' %}">Управление</a></div>
+{% if account %}<div class="actions"><a href="{% url 'accounts:edit' account.pk %}">Изменить счёт</a><a href="{% url 'accounts:delete' account.pk %}">Удалить счёт</a></div>{% if account.image %}<img class="account-image" src="{{ account.image.url }}" alt="{{ account.name }}">{% endif %}{% endif %}
+{% if operation %}<div class="actions"><span class="tag">{{ operation.get_status_display }}</span><a href="{% url 'operations:edit' operation.pk %}">Изменить расход</a>{% if operation.status != 'cancelled' %}<form method="post" action="{% url 'operations:cancel' operation.pk %}">{% csrf_token %}<button class="button secondary" type="submit">Отменить расход</button></form>{% endif %}</div>{% endif %}
+{% block content %}{% endblock %}
+{% include 'includes/pagination.html' %}
+</main>
 <footer>Система учёта расходов <span>Пользователи · Счета · Категории · Операции</span></footer></div></body></html>

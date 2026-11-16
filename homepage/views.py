@@ -1,25 +1,49 @@
 from django.shortcuts import render
 
-from db import repository as data
+from ledger import queries as data
+from ledger.models import Category, User
 
 
 def index(request):
-    accounts = data.get_accounts()
-    operations = data.get_operations()
-    return render(request, "homepage/index.html", {
-        "accounts": accounts, "operations": operations[:5],
-        "summary": data.get_summary(),
-    })
+    accounts = data.accounts()
+    operations = data.operations().active()
+    return render(
+        request,
+        "homepage/index.html",
+        {
+            "accounts": accounts,
+            "operations": operations[:5],
+            "summary": data.summary(),
+        },
+    )
 
 
 def user_list(request):
-    return render(request, "homepage/users.html", {"users": data.get_users()})
+    return render(
+        request,
+        "ledger/directory.html",
+        {
+            "items": User.objects.all(),
+            "title": "Пользователи",
+            "create_url": "homepage:user_create",
+            "edit_url": "homepage:user_edit",
+            "delete_url": "homepage:user_delete",
+        },
+    )
 
 
 def category_list(request):
-    return render(request, "homepage/categories.html", {
-        "categories": data.get_categories(),
-    })
+    return render(
+        request,
+        "ledger/directory.html",
+        {
+            "items": Category.objects.all(),
+            "title": "Категории расходов",
+            "create_url": "homepage:category_create",
+            "edit_url": "homepage:category_edit",
+            "delete_url": "homepage:category_delete",
+        },
+    )
 
 
 def page_not_found(request, exception):

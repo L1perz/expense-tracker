@@ -1,216 +1,97 @@
-# Установка и запуск на Linux
+# Установка на Linux
 
-Пошаговая инструкция для Ubuntu/Debian и совместимых систем с `apt`.
-После установки системных пакетов команды проекта одинаковы для других
-дистрибутивов Linux с подходящей версией Python. Команды рассчитаны на Bash.
+## Пакеты
 
-## 1. Установить зависимости
+Arch Linux:
 
-Открой терминал и выполни:
+```bash
+sudo pacman -Syu --needed git python python-pip
+```
+
+Ubuntu/Debian:
 
 ```bash
 sudo apt update
-sudo apt install -y git python3 python3-venv python3-pip
+sudo apt install git python3 python3-venv python3-pip
 ```
 
-Пакет `python3-venv` нужен для создания виртуального окружения. Он доступен
-в репозиториях [Ubuntu](https://packages.ubuntu.com/noble/python3-venv)
-и [Debian](https://packages.debian.org/bookworm/python3-venv).
-Остальные команды проекта выполняй от своего пользователя, без `sudo`.
-
-Проверь версии:
+Нужны Python 3.11–3.14 и SQLite 3.37+:
 
 ```bash
 python3 --version
-python3 -c "import sqlite3; print('SQLite:', sqlite3.sqlite_version)"
+python3 -c "import sqlite3; print(sqlite3.sqlite_version)"
 ```
 
-Для этой версии проекта используй **Python 3.11–3.14**. Совместимость с Python
-ограничена используемой веткой [Django 5.2](https://docs.djangoproject.com/en/5.2/faq/install/#what-python-version-can-i-use-with-django).
-Если установлен Python 3.10 или старше, сначала установи подходящий интерпретатор.
-Для Python 3.15 также выбери поддерживаемую версию, например 3.12 или 3.13.
-
-SQLite должна быть версии **3.37.0 или новее**: схема использует
-[STRICT-таблицы](https://www.sqlite.org/stricttables.html).
-Проверять нужно именно библиотеку из Python, как во второй команде выше.
-Отдельный сервер базы данных устанавливать не требуется.
-
-## 2. Скачать проект
+## Первая установка
 
 ```bash
-cd ~
 git clone https://github.com/L1perz/expense-tracker.git
 cd expense-tracker
-```
-
-Если репозиторий уже скачан, просто перейди в его папку. После распаковки
-ZIP-архива также перейди в каталог с файлом `manage.py`.
-Все дальнейшие команды выполняются из этого каталога.
-
-## 3. Создать окружение и установить Python-пакеты
-
-```bash
 python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python manage.py migrate
+.venv/bin/python manage.py import_legacy
+.venv/bin/python manage.py createsuperuser
+.venv/bin/python manage.py runserver
 ```
 
-Если подходящая версия установлена под отдельным именем, например `python3.12`,
-используй её вместо `python3` при создании нового окружения.
+Последние две команды: создать собственный вход в админку и запустить сервер.
+Импорт нужен один раз, если нужны демонстрационные данные.
+Открыть <http://127.0.0.1:8000/>; админка — <http://127.0.0.1:8000/admin/>.
+Остановка — Ctrl+C. Окружение Windows на Linux не копируется, а создаётся заново.
 
-На Linux интерпретатор окружения находится в `.venv/bin/python`, а не в
-`.venv/Scripts/python.exe`. Окружение с Windows переносить не нужно: создай
-его заново на Linux. Это соответствует устройству
-[виртуальных окружений Python](https://docs.python.org/3.12/library/venv.html).
-
-Проверь, что команды используют окружение проекта:
-
-```bash
-python -c "import sys; print(sys.executable)"
-python -m django --version
-```
-
-Путь к интерпретатору должен заканчиваться на `/expense-tracker/.venv/bin/python`
-при установке в каталог из пункта 2. Django должен быть версии `5.2.x`.
-
-## 4. Подготовить базу данных
-
-```bash
-python -m db.import_json
-```
-
-Команда создаст `data/expenses.sqlite`, таблицы и перенесёт данные из JSON.
-На исходных демонстрационных данных результат будет таким:
-
-```text
-Импорт завершён: users: 3, accounts: 4, categories: 5, operations: 9
-```
-
-Если база уже содержит данные, программа сообщит об этом и сохранит их.
-Для обычного повторного запуска импорт выполнять не нужно.
-Команда `manage.py migrate` для текущего SQL-хранилища не требуется.
-
-## 5. Проверить настройки и запустить сайт
-
-```bash
-python manage.py check
-python manage.py runserver 127.0.0.1:8000
-```
-
-После успешного запуска открой в браузере:
-
-<http://127.0.0.1:8000/>
-
-Терминал с сервером оставь открытым. Остановка сервера — **Ctrl+C**.
-Здесь используется локальный сервер разработки Django; его назначение описано
-в [документации Django](https://docs.djangoproject.com/en/5.2/intro/install/).
-
-## 6. Повторный запуск
-
-После закрытия терминала или перезагрузки компьютера:
+## Повторный запуск
 
 ```bash
 cd ~/expense-tracker
-source .venv/bin/activate
-python manage.py runserver 127.0.0.1:8000
+.venv/bin/python manage.py runserver
 ```
 
-Если скачал проект в другую папку, замени путь в первой команде.
-Переустанавливать зависимости и повторно импортировать данные каждый раз не нужно.
-
-Вместо активации окружения можно вызывать его Python напрямую:
+Консоль с той же базой:
 
 ```bash
-.venv/bin/python manage.py runserver 127.0.0.1:8000
+.venv/bin/python main.py
 ```
 
-Чтобы выйти из активированного окружения после остановки сервера:
+## Обновление
+
+Сначала проверить локальные изменения и сохранить копию данных.
+Если `git status` показывает изменённые файлы, их нужно сохранить отдельным коммитом
+или в `git stash`, а не удалять. Не применять `git reset --hard` для обновления.
 
 ```bash
-deactivate
-```
-
-## Консольная версия и данные
-
-В корне проекта, с активированным окружением:
-
-```bash
-python main.py
-```
-
-Консоль изменяет JSON-файлы, а сайт читает SQLite. Чтобы перенести изменения
-из JSON на сайт, останови сервер и выполни:
-
-```bash
-python -m db.import_json --replace
-```
-
-**Эта команда заменяет содержимое всех четырёх таблиц данными из JSON.**
-Сохрани копию базы, если её текущее содержимое нужно оставить.
-Для обычного запуска сайта этот флаг не нужен.
-
-## Тесты и проверка кода
-
-```bash
-python manage.py check
-python -m pytest -q
-python -m flake8
-```
-
-Тесты используют временные базы и не изменяют рабочую SQLite.
-В [карте кода](CODE_GUIDE.md) есть примеры демонстрации запросов и страниц.
-Если в других инструкциях встречается Windows-команда
-`.\.venv\Scripts\python.exe`, на Linux замени её на `.venv/bin/python`
-или на `python` при активированном окружении.
-
-## Обновление проекта
-
-Останови сервер. Если редактировал исходники, сначала сохрани свои изменения
-в Git, затем из корня проекта выполни:
-
-```bash
+git status
 git pull --ff-only
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-python manage.py check
-python manage.py runserver 127.0.0.1:8000
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python manage.py migrate
+.venv/bin/python manage.py check
 ```
 
-Локальная SQLite не хранится в Git и не заменяется командой `git pull`.
-Обновлять её из JSON нужно только при намеренном повторном импорте.
+Старая база `data/expenses.sqlite` остаётся отдельным источником. В пустую
+`data/ledger.sqlite3` её можно перенести после миграций:
+
+```bash
+.venv/bin/python manage.py import_legacy --database-source data/expenses.sqlite
+```
+
+Не запускать повторный импорт демонстрационных данных при обычном обновлении.
 
 ## Частые ошибки
 
-| Ошибка | Что сделать |
-| --- | --- |
-| `python3: command not found` | Установить `python3` через менеджер пакетов системы. |
-| `No module named venv` или `ensurepip is not available` | Установить `python3-venv`. Для отдельно установленного интерпретатора нужен пакет `venv` той же версии. |
-| `externally-managed-environment` | Создать `.venv` и установить зависимости через `.venv/bin/python -m pip install -r requirements.txt`. |
-| `No module named django` | Активировать окружение и выполнить `python -m pip install -r requirements.txt`. |
-| `No module named _sqlite3` или ошибка возле `STRICT` | Проверить SQLite через Python. Использовать интерпретатор с модулем `sqlite3` и библиотекой SQLite 3.37.0+. Обновление только утилиты `sqlite3` не гарантирует обновление библиотеки Python. |
-| На сайте «Данные ещё не подготовлены», HTTP 503 | Выполнить `python -m db.import_json` из корня проекта. Если настроен `EXPENSE_DB_PATH`, убедиться, что сервер и импорт используют один путь. |
-| `Address already in use` | Выбрать другой порт: `python manage.py runserver 127.0.0.1:8001`, затем открыть `http://127.0.0.1:8001/`. |
-| `Permission denied` при создании базы | Проверить доступ на запись к каталогу `data/` и расположение проекта в каталоге своего пользователя. |
-| Сервер работает, но браузер не открывает сайт | Оставить процесс сервера запущенным и проверить адрес с тем же портом. На удалённой машине смотри раздел ниже. |
+- Нет `manage.py`: открыта старая консольная версия или другая папка.
+  Проверить `pwd`, `git log -1`, `git status` и наличие актуальной ветки.
+- `No module named django`: выполнить установку через `.venv/bin/python -m pip`.
+- `No such table`: выполнить `.venv/bin/python manage.py migrate` для выбранной базы.
+- `База уже содержит данные`: повторный импорт не нужен; данные сохранены.
+- Порт занят: `.venv/bin/python manage.py runserver 127.0.0.1:8001`.
+- Пустые списки: добавить данные через формы либо один раз вызвать `import_legacy`.
+- Изображения не открываются: при локальной работе нужен `DEBUG=True` и файл
+  в `media/`; SQLite хранит только относительный путь к изображению.
 
-При проверке пути к базе можно выполнить:
+Проверки:
 
 ```bash
-python manage.py shell -c "from django.conf import settings; print(settings.EXPENSE_DB_PATH.resolve())"
+.venv/bin/python manage.py makemigrations --check --dry-run
+.venv/bin/python -m pytest -q
+.venv/bin/python -m flake8
 ```
-
-## Если Linux находится на удалённой машине
-
-Сервер запускается на Linux обычной командой из пункта 5.
-Чтобы открыть его в браузере своего компьютера, в отдельном терминале на своём
-компьютере создай SSH-туннель:
-
-```bash
-ssh -L 8000:127.0.0.1:8000 user@server
-```
-
-Замени `user@server` своим логином и адресом Linux-машины. Пока SSH-соединение
-открыто, сайт будет доступен на твоём компьютере по адресу
-<http://127.0.0.1:8000/>. Если локальный порт 8000 занят, используй
-`ssh -L 8001:127.0.0.1:8000 user@server` и открой порт 8001 в браузере.
