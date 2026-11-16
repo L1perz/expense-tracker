@@ -1,9 +1,23 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils.text import smart_split, unescape_string_literal
 
+from .db_functions import search_text
 from .forms import AccountForm, CategoryForm, OperationForm
 from .models import Account, Category, Operation, User
 from utils import format_money
+
+
+class UnicodeSearchAdmin(admin.ModelAdmin):
+    def get_search_results(self, request, queryset, search_term):
+        fields = self.get_search_fields(request)
+        if fields and search_term:
+            for term in smart_split(search_term):
+                if term.startswith(('"', "'")) and term[0] == term[-1]:
+                    term = unescape_string_literal(term)
+                queryset = search_text(queryset, fields, term)
+        # В search_fields используются только собственные поля и связи ForeignKey.
+        return queryset, False
 
 
 class OperationInline(admin.TabularInline):
@@ -31,7 +45,7 @@ class AccountInline(admin.TabularInline):
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(UnicodeSearchAdmin):
     list_display = ("id", "name")
     search_fields = ("name",)
     inlines = (AccountInline, OperationInline)
@@ -39,7 +53,7 @@ class UserAdmin(admin.ModelAdmin):
 
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(UnicodeSearchAdmin):
     form = CategoryForm
     list_display = ("id", "name")
     search_fields = ("name",)
@@ -48,7 +62,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 @admin.register(Account)
-class AccountAdmin(admin.ModelAdmin):
+class AccountAdmin(UnicodeSearchAdmin):
     form = AccountForm
     list_display = ("name", "user", "current_balance")
     search_fields = ("name", "user__name")
@@ -83,7 +97,7 @@ class AccountAdmin(admin.ModelAdmin):
 
 
 @admin.register(Operation)
-class OperationAdmin(admin.ModelAdmin):
+class OperationAdmin(UnicodeSearchAdmin):
     form = OperationForm
     list_display = (
         "description",

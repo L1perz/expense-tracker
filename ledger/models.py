@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.text import slugify
 
-from .db_functions import UnicodeCasefold
+from .db_functions import search_text
 
 MAX_MONEY = 999_999_999_999
 
@@ -146,17 +146,8 @@ class OperationQuerySet(models.QuerySet):
         return self.select_related("user", "account__user", "category")
 
     def search(self, text):
-        text = text.casefold()
-        return self.alias(
-            search_description=UnicodeCasefold("description"),
-            search_account=UnicodeCasefold("account__name"),
-            search_category=UnicodeCasefold("category__name"),
-            search_user=UnicodeCasefold("user__name"),
-        ).filter(
-            Q(search_description__contains=text)
-            | Q(search_account__contains=text)
-            | Q(search_category__contains=text)
-            | Q(search_user__contains=text)
+        return search_text(
+            self, ("description", "account__name", "category__name", "user__name"), text
         )
 
     def update(self, **kwargs):

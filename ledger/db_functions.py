@@ -1,11 +1,22 @@
 """Unicode casefold для поиска в SQLite без дополнительных расширений."""
 
-from django.db.models import Func
+from django.db.models import Func, Q
 
 
 class UnicodeCasefold(Func):
     function = "UNICODE_CASEFOLD"
     arity = 1
+
+
+def search_text(queryset, fields, text):
+    aliases = {
+        f"unicode_search_{index}": UnicodeCasefold(field)
+        for index, field in enumerate(fields)
+    }
+    condition = Q()
+    for alias in aliases:
+        condition |= Q(**{f"{alias}__contains": text.casefold()})
+    return queryset.alias(**aliases).filter(condition)
 
 
 def casefold(value):

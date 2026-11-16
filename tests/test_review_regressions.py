@@ -181,3 +181,29 @@ def test_unicode_search_function_is_registered_on_new_connection():
             assert cursor.fetchone() == ("ёж strasse",)
     finally:
         another.close()
+
+
+@pytest.mark.parametrize("model,query", [
+    ("operation", "обед"), ("operation", "карта"),
+    ("operation", "еда"), ("operation", "тест"),
+    ("account", "карта"), ("account", "тест"),
+    ("category", "еда"), ("user", "тест"),
+])
+def test_admin_search_uses_unicode_for_all_models(wallet, admin_client, model, query):
+    buy(wallet)
+    response = admin_client.get(f"/admin/ledger/{model}/", {"q": query})
+    assert response.status_code == 200
+    assert response.context["cl"].queryset.count() == 1
+
+
+def test_admin_search_preserves_words_phrases_and_filters(wallet, admin_client):
+    operation = buy(wallet)
+    operation.description = "Обед с другом"
+    operation.save()
+    url = "/admin/ledger/operation/"
+    response = admin_client.get(url, {"q": '"ОБЕД С" ДРУГОМ'})
+    assert list(response.context["cl"].queryset) == [operation]
+    response = admin_client.get(url, {"q": '"С ОБЕД"'})
+    assert not response.context["cl"].queryset.exists()
+    response = admin_client.get(url, {"q": "обед", "status__exact": "cancelled"})
+    assert not response.context["cl"].queryset.exists()
